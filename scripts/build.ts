@@ -61,9 +61,9 @@ const osConfigs: Record<string, OSConfig> = {
   },
   fedora: {
     name: "fedora",
-    version: "39",
-    isoUrl: "https://download.fedoraproject.org/pub/fedora/linux/releases/39/Server/x86_64/iso/Fedora-Server-dvd-x86_64-39-1.5.iso",
-    isoChecksum: "c8e7b6a5d4f3e2c1b0a9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7",
+    version: "41",
+    isoUrl: "https://download.fedoraproject.org/pub/fedora/linux/releases/41/Server/x86_64/iso/Fedora-Server-netinst-x86_64-41-1.4.iso",
+    isoChecksum: "630c52ba9e7a7f229b026e241ba74b9bc105e60ba5bf7b222693ae0e25f05c97",
     packerTemplate: "fedora.pkr.hcl",
     preparationScript: "fedora-prepare.sh",
     validationScript: "fedora-validate.ts",
