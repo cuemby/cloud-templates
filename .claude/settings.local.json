@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(fd:*)",
+      "Bash(mkdir:*)",
+      "WebFetch(domain:docs.cloudstack.apache.org)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}

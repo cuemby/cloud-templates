@@ -1,0 +1,37 @@
+{
+  "tasks": {
+    "init": "deno run --allow-env --allow-read --allow-write scripts/init.ts",
+    "build": "deno run --allow-env --allow-read --allow-write --allow-run scripts/build.ts",
+    "build:ubuntu": "deno run --allow-env --allow-read --allow-write --allow-run scripts/build.ts ubuntu",
+    "build:almalinux": "deno run --allow-env --allow-read --allow-write --allow-run scripts/build.ts almalinux",
+    "build:rockylinux": "deno run --allow-env --allow-read --allow-write --allow-run scripts/build.ts rockylinux",
+    "build:centos": "deno run --allow-env --allow-read --allow-write --allow-run scripts/build.ts centos",
+    "build:suse": "deno run --allow-env --allow-read --allow-write --allow-run scripts/build.ts suse",
+    "build:redhat": "deno run --allow-env --allow-read --allow-write --allow-run scripts/build.ts redhat",
+    "build:fedora": "deno run --allow-env --allow-read --allow-write --allow-run scripts/build.ts fedora",
+    "build:all": "deno run --allow-env --allow-read --allow-write --allow-run scripts/build-all.ts",
+    "validate": "deno run --allow-env --allow-read --allow-write --allow-run scripts/validate.ts",
+    "deploy": "deno run --allow-env --allow-read --allow-write --allow-net --allow-run scripts/deploy.ts",
+    "clean": "deno run --allow-env --allow-read --allow-write --allow-run scripts/clean.ts",
+    "status": "deno run --allow-env --allow-read scripts/status.ts",
+    "test": "deno test --allow-env --allow-read --allow-write --allow-run",
+    "fmt": "deno fmt",
+    "lint": "deno lint",
+    "check": "deno check **/*.ts"
+  },
+  "imports": {
+    "@std/fs": "jsr:@std/fs@^1.0.17",
+    "@std/path": "jsr:@std/path@^1.0.8",
+    "@std/yaml": "jsr:@std/yaml@^1.0.5",
+    "@std/json": "jsr:@std/json@^1.0.1",
+    "@std/log": "jsr:@std/log@^0.224.10",
+    "dax": "jsr:@david/dax@^0.42.0"
+  },
+  "exclude": [
+    "templates/*/output/",
+    "**/*.iso",
+    "**/*.qcow2",
+    "**/*.vhd",
+    "**/*.ova"
+  ]
+}
