@@ -9,22 +9,22 @@ packer {
 
 variable "iso_url" {
   type    = string
-  default = "https://repo.almalinux.org/almalinux/9.3/isos/x86_64/AlmaLinux-9.3-x86_64-minimal.iso"
+  default = "https://repo.almalinux.org/almalinux/9/isos/x86_64/AlmaLinux-9-latest-x86_64-minimal.iso"
 }
 
 variable "iso_checksum" {
   type    = string
-  default = "7bd6f78c0f4e6b3bb2b4a1c2c2f2a9b5d8c3a9b5d8c3a9b5d8c3a9b5d8c3a9b5"
+  default = "27a346c74d8755516a4ad2057ea29c2450454f1a928628734f26e12b0b8120d7"
 }
 
 variable "output_directory" {
   type    = string
-  default = "output"
+  default = "templates/almalinux/output"
 }
 
 variable "vm_name" {
   type    = string
-  default = "almalinux-9.3-cloudstack"
+  default = "almalinux-9-cloudstack"
 }
 
 source "qemu" "almalinux" {
@@ -35,7 +35,7 @@ source "qemu" "almalinux" {
   disk_size         = "20G"
   format            = "qcow2"
   accelerator       = "kvm"
-  http_directory    = "http"
+  http_directory    = "templates/almalinux/http"
   ssh_username      = "packer"
   ssh_password      = "packer"
   ssh_timeout       = "20m"
@@ -60,7 +60,7 @@ build {
     ]
     execute_command = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     scripts = [
-      "../../scripts/preparation/almalinux-prepare.sh"
+      "scripts/preparation/almalinux-prepare.sh"
     ]
   }
 

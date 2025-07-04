@@ -16,9 +16,9 @@ const osConfigs: Record<string, OSConfig> = {
   },
   almalinux: {
     name: "almalinux",
-    version: "9.3",
-    isoUrl: "https://repo.almalinux.org/almalinux/9.3/isos/x86_64/AlmaLinux-9.3-x86_64-dvd.iso",
-    isoChecksum: "7bd6f78c0f4e6b3bb2b4a1c2c2f2a9b5d8c3a9b5d8c3a9b5d8c3a9b5d8c3a9b5",
+    version: "9",
+    isoUrl: "https://repo.almalinux.org/almalinux/9/isos/x86_64/AlmaLinux-9-latest-x86_64-minimal.iso",
+    isoChecksum: "27a346c74d8755516a4ad2057ea29c2450454f1a928628734f26e12b0b8120d7",
     packerTemplate: "almalinux.pkr.hcl",
     preparationScript: "almalinux-prepare.sh",
     validationScript: "almalinux-validate.ts",
