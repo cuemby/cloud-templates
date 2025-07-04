@@ -2,7 +2,7 @@
 
 ## Ubuntu
 - **Ubuntu 20.04 LTS**: https://releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso
-- **Ubuntu 22.04 LTS**: https://releases.ubuntu.com/22.04/ubuntu-22.04.4-live-server-amd64.iso
+- **Ubuntu 22.04 LTS**: https://releases.ubuntu.com/22.04/ubuntu-22.04.5-live-server-amd64.iso
 - **Ubuntu 24.04 LTS**: https://releases.ubuntu.com/24.04/ubuntu-24.04.1-live-server-amd64.iso
 - **Checksums**: Available at https://releases.ubuntu.com/[version]/SHA256SUMS
 

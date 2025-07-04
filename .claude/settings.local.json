@@ -11,7 +11,13 @@
       "Bash(deno check:*)",
       "Bash(chmod:*)",
       "Bash(deno run:*)",
-      "Bash(deno task:*)"
+      "Bash(deno task:*)",
+      "WebFetch(domain:releases.ubuntu.com)",
+      "Bash(rm:*)",
+      "WebFetch(domain:download.rockylinux.org)",
+      "WebFetch(domain:mirrors.centos.org)",
+      "WebFetch(domain:mirror.centos.org)",
+      "WebFetch(domain:isoredirect.centos.org)"
     ],
     "deny": []
   }

@@ -9,22 +9,22 @@ packer {
 
 variable "iso_url" {
   type    = string
-  default = "https://releases.ubuntu.com/22.04/ubuntu-22.04.3-live-server-amd64.iso"
+  default = "https://releases.ubuntu.com/22.04/ubuntu-22.04.5-live-server-amd64.iso"
 }
 
 variable "iso_checksum" {
   type    = string
-  default = "a4acfda10b18da50e2ec50ccaf860d7f20b389df8765611142305c0e911d16fd"
+  default = "9bc6028870aef3f74f4e16b900008179e78b130e6b0b9a140635434a46aa98b0"
 }
 
 variable "output_directory" {
   type    = string
-  default = "output"
+  default = "templates/ubuntu/output"
 }
 
 variable "vm_name" {
   type    = string
-  default = "ubuntu-22.04-cloudstack"
+  default = "ubuntu-22.04.5-cloudstack"
 }
 
 source "qemu" "ubuntu" {
@@ -35,7 +35,7 @@ source "qemu" "ubuntu" {
   disk_size         = "20G"
   format            = "qcow2"
   accelerator       = "kvm"
-  http_directory    = "http"
+  http_directory    = "templates/ubuntu/http"
   ssh_username      = "packer"
   ssh_password      = "packer"
   ssh_timeout       = "20m"
@@ -74,7 +74,7 @@ build {
     ]
     execute_command = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     scripts = [
-      "../../scripts/preparation/ubuntu-prepare.sh"
+      "scripts/preparation/ubuntu-prepare.sh"
     ]
   }
 
