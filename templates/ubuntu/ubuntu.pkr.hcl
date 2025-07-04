@@ -1,0 +1,102 @@
+packer {
+  required_plugins {
+    qemu = {
+      version = ">= 1.0.0"
+      source  = "github.com/hashicorp/qemu"
+    }
+  }
+}
+
+variable "iso_url" {
+  type    = string
+  default = "https://releases.ubuntu.com/22.04/ubuntu-22.04.3-live-server-amd64.iso"
+}
+
+variable "iso_checksum" {
+  type    = string
+  default = "a4acfda10b18da50e2ec50ccaf860d7f20b389df8765611142305c0e911d16fd"
+}
+
+variable "output_directory" {
+  type    = string
+  default = "output"
+}
+
+variable "vm_name" {
+  type    = string
+  default = "ubuntu-22.04-cloudstack"
+}
+
+source "qemu" "ubuntu" {
+  iso_url           = var.iso_url
+  iso_checksum      = "sha256:${var.iso_checksum}"
+  output_directory  = var.output_directory
+  shutdown_command  = "echo 'packer' | sudo -S shutdown -P now"
+  disk_size         = "20G"
+  format            = "qcow2"
+  accelerator       = "kvm"
+  http_directory    = "http"
+  ssh_username      = "packer"
+  ssh_password      = "packer"
+  ssh_timeout       = "20m"
+  vm_name           = var.vm_name
+  net_device        = "virtio-net"
+  disk_interface    = "virtio"
+  boot_wait         = "5s"
+  boot_command = [
+    "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",
+    "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",
+    "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",
+    "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",
+    "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",
+    "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",
+    "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",
+    "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",
+    "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",
+    "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",
+    "c<wait>",
+    "linux /casper/vmlinuz --- autoinstall ds=\"nocloud-net;seedfrom=http://{{.HTTPIP}}:{{.HTTPPort}}/\"<enter><wait>",
+    "initrd /casper/initrd<enter><wait>",
+    "boot<enter><wait>"
+  ]
+  memory = 2048
+  cpus   = 2
+}
+
+build {
+  name = "ubuntu"
+  sources = ["source.qemu.ubuntu"]
+
+  provisioner "shell" {
+    environment_vars = [
+      "HOME_DIR=/home/packer",
+      "DEBIAN_FRONTEND=noninteractive"
+    ]
+    execute_command = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
+    scripts = [
+      "../../scripts/preparation/ubuntu-prepare.sh"
+    ]
+  }
+
+  provisioner "shell" {
+    inline = [
+      "sudo apt-get clean",
+      "sudo rm -rf /var/lib/apt/lists/*",
+      "sudo rm -rf /tmp/*",
+      "sudo rm -rf /var/tmp/*",
+      "sudo rm -f /var/log/wtmp /var/log/btmp",
+      "sudo rm -rf /var/log/installer",
+      "sudo rm -rf /var/lib/cloud/instances/*",
+      "sudo rm -rf /home/packer/.ssh/authorized_keys",
+      "sudo rm -rf /root/.ssh/authorized_keys",
+      "history -c"
+    ]
+  }
+
+  post-processor "shell-local" {
+    inline = [
+      "echo 'Ubuntu template build completed'",
+      "qemu-img info ${var.output_directory}/${var.vm_name}"
+    ]
+  }
+}

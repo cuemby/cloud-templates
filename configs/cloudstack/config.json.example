@@ -1,0 +1,7 @@
+{
+  "url": "http://your-cloudstack-mgmt-server:8080/client/api",
+  "apiKey": "your-api-key-here",
+  "secretKey": "your-secret-key-here",
+  "zoneId": "your-zone-id-here",
+  "hypervisor": "KVM"
+}

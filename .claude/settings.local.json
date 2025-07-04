@@ -7,7 +7,11 @@
       "Bash(mkdir:*)",
       "WebFetch(domain:docs.cloudstack.apache.org)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(deno check:*)",
+      "Bash(chmod:*)",
+      "Bash(deno run:*)",
+      "Bash(deno task:*)"
     ],
     "deny": []
   }

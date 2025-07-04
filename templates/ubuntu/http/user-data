@@ -1,0 +1,64 @@
+#cloud-config
+autoinstall:
+  version: 1
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+  network:
+    network:
+      version: 2
+      ethernets:
+        eth0:
+          dhcp4: yes
+          dhcp-identifier: mac
+  storage:
+    layout:
+      name: direct
+    swap:
+      size: 1G
+  identity:
+    hostname: ubuntu-template
+    username: packer
+    password: $6$rounds=4096$saltsalt$L.xzXkZ2mN.gQdvOIcN6c9pzWxhJh9GpZGnLEKXkgQgpzJhPgdKO0vKQlLMd7qGqWd1qJl7JdMqLdMqLdMqLdA/
+  ssh:
+    install-server: yes
+    allow-pw: yes
+  packages:
+    - cloud-init
+    - cloud-utils
+    - cloud-guest-utils
+    - openssh-server
+    - curl
+    - wget
+    - vim
+    - htop
+    - net-tools
+    - iputils-ping
+    - dnsutils
+    - software-properties-common
+    - apt-transport-https
+    - ca-certificates
+    - gnupg
+    - lsb-release
+  user-data:
+    disable_root: false
+    preserve_hostname: false
+    manage_etc_hosts: true
+    package_update: true
+    package_upgrade: true
+    timezone: UTC
+    users:
+      - name: packer
+        plain_text_passwd: packer
+        home: /home/packer
+        shell: /bin/bash
+        lock_passwd: false
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        ssh_authorized_keys: []
+  early-commands:
+    - systemctl stop ssh
+  late-commands:
+    - echo 'packer ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/packer
+    - chmod 440 /target/etc/sudoers.d/packer
+    - 'curtin in-target --target=/target -- systemctl enable ssh'
+    - 'curtin in-target --target=/target -- systemctl start ssh'
