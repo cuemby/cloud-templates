@@ -6,7 +6,8 @@
       "Bash(fd:*)",
       "Bash(mkdir:*)",
       "WebFetch(domain:docs.cloudstack.apache.org)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
