@@ -13,9 +13,10 @@ Automated system for building multiple OS templates (Ubuntu, AlmaLinux, RockyLin
 - Fedora
 
 ## Current Status
-- Empty project repository
-- CloudStack template documentation researched
-- Project scope defined for OS template automation
+- **CRITICAL ARCHITECTURAL FINDING**: M1 Mac incompatibility with x86 virtualization requires cloud-native build approach
+- Project foundation and OS templates completed (Phases 1-3)
+- **ARCHITECTURE DECISION**: Migration to GitHub Actions-based builds required for cross-platform compatibility
+- 5 OS template builders created but require cloud infrastructure for execution
 
 ## Todo Items
 
@@ -42,12 +43,15 @@ Automated system for building multiple OS templates (Ubuntu, AlmaLinux, RockyLin
 - [x] **RedHat template builder** - RedHat template configuration pending (subscription requirements)
 - [x] **Fedora template builder** - Fedora 41 Server template created
 
-### Phase 4: Automation & Integration
-- [ ] **Create CI/CD pipeline** - Automated template building and deployment
-- [ ] **Add template versioning** - Version management for template updates
-- [ ] **Implement batch processing** - Build multiple OS templates in parallel
-- [ ] **Create monitoring & logging** - Track template build status and errors
-- [ ] **Documentation completion** - Usage guides and troubleshooting docs
+### Phase 4: Cloud-Native Architecture Migration (PRIORITY)
+- [ ] **GitHub Actions workflow setup** - CI/CD pipeline for x86 builds
+- [ ] **Self-hosted runner configuration** - x86 infrastructure for template builds
+- [ ] **Matrix build implementation** - Parallel builds for multiple OS variants
+- [ ] **ISO caching and management** - Optimize download and storage
+- [ ] **Build artifact versioning** - Template version management and storage
+- [ ] **Error handling and retry logic** - Robust failure recovery
+- [ ] **CloudStack integration pipeline** - Automated template deployment
+- [ ] **Security scanning integration** - Vulnerability assessment in CI/CD
 
 ## Key CloudStack Template Requirements
 Based on CloudStack documentation:
@@ -59,11 +63,65 @@ Based on CloudStack documentation:
 - Templates can be uploaded via HTTP server, local upload, or converted from existing instances
 
 ## Technical Approach
-- Use Packer for automated OS template building
+### Current Architecture (Local - INCOMPATIBLE with M1 Mac)
+- ~~Use Packer for automated OS template building~~ (Requires x86 virtualization)
+- ~~Local QEMU/KVM execution~~ (Not available on M1 Mac)
+
+### New Architecture (Cloud-Native - REQUIRED)
+- **GitHub Actions with x86 runners** for Packer execution
+- **Matrix build strategy** for parallel OS template creation
+- **Cloud artifact storage** (GitHub Packages + S3-compatible)
+- **GitOps configuration management** with validation gates
+- **Infrastructure as Code** approach for reproducible builds
 - Implement standardized post-installation scripts for each OS
 - Create consistent networking and security configurations
 - Automate CloudStack template registration and deployment
 - Following simplicity principle - each task should be minimal and focused
+
+## Architectural Decision Record (ADR)
+
+### ADR-001: Migration to Cloud-Native Build Architecture
+
+**Status**: APPROVED  
+**Date**: 2025-01-05  
+**Context**: M1 Mac hardware incompatibility with x86 virtualization requirements
+
+#### Problem Statement
+The current local build architecture assumes x86 virtualization capabilities (QEMU/KVM) that are not available on Apple Silicon (M1/M2) hardware. This creates a fundamental blocker for template development and testing on modern Mac hardware.
+
+#### Decision
+Migrate from local Packer builds to cloud-native GitHub Actions-based template building with x86 runners.
+
+#### Consequences
+**Positive:**
+- Cross-platform compatibility for all development environments
+- Scalable, parallel builds through matrix strategy
+- Version-controlled, auditable build process
+- Professional CI/CD practices implementation
+- Cost-effective scaling with usage-based pricing
+
+**Negative:**
+- Dependency on cloud infrastructure for all builds
+- GitHub Actions usage costs (mitigated by self-hosted runners)
+- Increased complexity in local development workflow
+- Network dependency for build operations
+
+#### Implementation Plan
+1. **Phase 4a**: GitHub Actions foundation with single OS proof-of-concept
+2. **Phase 4b**: Matrix builds for all 5 OS templates
+3. **Phase 4c**: CloudStack integration and deployment automation
+4. **Phase 4d**: Production hardening and monitoring
+
+#### Alternatives Considered
+- **Docker-based local builds**: Still requires x86 emulation on M1
+- **Remote development environments**: Higher cost, slower iteration
+- **Platform restriction**: Limits team to x86 hardware only
+
+#### Success Criteria
+- All OS templates buildable in GitHub Actions
+- Build success rate >95%
+- Average build time <30 minutes per template
+- Total cost <$50/month for regular development usage
 
 ## Review Section
 *This section will be updated as work progresses*
@@ -96,22 +154,61 @@ Based on CloudStack documentation:
   - Added comprehensive cloud-init configurations for CloudStack integration
   - Set up password reset capabilities and networking for CloudStack environments
 
-### Next Steps
-- **Phase 4: Testing and Integration**
-  - Debug and resolve path resolution issues in template builders
-  - Test template building process with actual OS installations
-  - Validate CloudStack deployment functionality with built templates
-  - Implement CI/CD pipeline for automated template building
-  - Add template versioning and lifecycle management
-- **Phase 5: Production Readiness**
-  - Add comprehensive error handling and retry logic
-  - Implement monitoring and logging for template builds
-  - Create documentation for template deployment and maintenance
-  - Set up template repository and distribution system
+### Critical Architectural Pivot Required
+**IMMEDIATE ACTION NEEDED**: The current local build approach is fundamentally incompatible with M1 Mac hardware due to x86 virtualization requirements.
+
+### Phase 4: Cloud-Native Migration (IMMEDIATE PRIORITY)
+- **Week 1-2: CI/CD Foundation**
+  - Set up GitHub Actions workflow with x86 runner support
+  - Implement basic matrix build for single OS validation
+  - Configure artifact storage and caching strategy
+  - Establish security scanning and validation gates
+
+- **Week 3-4: Template Pipeline**
+  - Migrate all 5 OS templates to GitHub Actions execution
+  - Implement ISO caching and management optimization
+  - Add build artifact versioning and storage
+  - Create comprehensive error handling and retry logic
+
+- **Week 5-6: CloudStack Integration**
+  - Automate template upload and registration pipeline
+  - Implement deployment validation and testing
+  - Add rollback mechanisms and failure recovery
+  - Create monitoring and alerting systems
+
+### Phase 5: Production Readiness
+- **Performance Optimization**: Build time reduction, resource optimization
+- **Cost Management**: Runner utilization optimization, storage lifecycle
+- **Security Hardening**: Template scanning, compliance validation
+- **Documentation**: Deployment guides, troubleshooting, maintenance procedures
 
 ### Implementation Notes
-- Ubuntu template needs debugging of autoinstall process and Packer path resolution
-- SUSE and RedHat templates require licensing/subscription considerations
-- All RHEL-based templates (AlmaLinux, RockyLinux, CentOS, Fedora) use consistent kickstart approach
-- CloudStack integration scripts are standardized across all OS templates
-- Path resolution issues need to be addressed in the base builder before production use
+
+#### Critical Architectural Constraints
+- **M1 Mac Incompatibility**: Local Packer/QEMU builds impossible due to x86 virtualization requirements
+- **Cloud-First Mandate**: All template builds must execute on x86 infrastructure (GitHub Actions or self-hosted)
+- **Cost Considerations**: GitHub Actions usage limits require optimization and potentially self-hosted runners
+
+#### Technical Debt and Migration Requirements
+- **Local Build System**: Current BaseTemplateBuilder class needs complete refactoring for cloud execution
+- **Path Resolution**: Local file path assumptions invalid in cloud environment
+- **Configuration Management**: Need GitOps approach for template configurations
+- **Artifact Storage**: Local output incompatible with distributed cloud builds
+
+#### OS-Specific Status
+- **Ubuntu**: Template created, autoinstall debugging needed in cloud environment
+- **RHEL-based** (AlmaLinux, RockyLinux, CentOS, Fedora): Consistent kickstart approach, cloud-ready
+- **SUSE/RedHat**: Licensing/subscription considerations for cloud builds
+- **CloudStack Integration**: Scripts standardized but need cloud deployment pipeline
+
+#### Infrastructure Requirements
+- **x86 Runners**: Self-hosted or GitHub-hosted with KVM/virtualization support
+- **Storage**: Artifact versioning, ISO caching, template distribution
+- **Networking**: Secure template upload to CloudStack environments
+- **Monitoring**: Build success rates, costs, performance metrics
+
+#### Risk Mitigation
+- **Vendor Lock-in**: GitHub Actions dependency managed through standardized workflows
+- **Cost Control**: Build optimization, caching strategies, usage monitoring
+- **Security**: Template scanning, access controls, audit logging
+- **Reliability**: Multi-runner pools, failure recovery, rollback capabilities
