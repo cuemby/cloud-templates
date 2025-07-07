@@ -9,12 +9,12 @@ packer {
 
 variable "iso_url" {
   type    = string
-  default = "https://releases.ubuntu.com/24.04/ubuntu-24.04.1-live-server-amd64.iso"
+  default = "https://releases.ubuntu.com/24.04/ubuntu-24.04.2-live-server-amd64.iso"
 }
 
 variable "iso_checksum" {
   type    = string
-  default = "e240e4b801f7bb68c20d1356b60968ad0c33b41d00d828e74ceb3364a0317be9"
+  default = "placeholder-checksum-will-be-logged-during-build"
 }
 
 variable "output_directory" {
@@ -24,7 +24,7 @@ variable "output_directory" {
 
 variable "vm_name" {
   type    = string
-  default = "ubuntu-24.04.1-cloudstack"
+  default = "ubuntu-24.04.2-cloudstack"
 }
 
 source "qemu" "ubuntu" {

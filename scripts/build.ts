@@ -8,9 +8,9 @@ import { CloudTemplateBuilder, CloudBuildOptions } from "./builders/cloud.ts";
 const osConfigs: Record<string, OSConfig> = {
   ubuntu: {
     name: "ubuntu",
-    version: "24.04.5",
-    isoUrl: "https://releases.ubuntu.com/24.04/ubuntu-24.04.1-live-server-amd64.iso",
-    isoChecksum: "e240e4b801f7bb68c20d1356b60968ad0c33b41d00d828e74ceb3364a0317be9",
+    version: "24.04.2",
+    isoUrl: "https://releases.ubuntu.com/24.04/ubuntu-24.04.2-live-server-amd64.iso",
+    isoChecksum: "placeholder-checksum-will-be-logged-during-build",
     packerTemplate: "ubuntu.pkr.hcl",
     preparationScript: "ubuntu-prepare.sh",
     validationScript: "ubuntu-validate.ts",

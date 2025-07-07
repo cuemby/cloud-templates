@@ -22,7 +22,8 @@
       "WebFetch(domain:repo.almalinux.org)",
       "WebFetch(domain:download.fedoraproject.org)",
       "WebFetch(domain:mirror.cs.siue.edu)",
-      "Bash(deno cache:*)"
+      "Bash(deno cache:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }
