@@ -21,7 +21,8 @@
       "Bash(git restore:*)",
       "WebFetch(domain:repo.almalinux.org)",
       "WebFetch(domain:download.fedoraproject.org)",
-      "WebFetch(domain:mirror.cs.siue.edu)"
+      "WebFetch(domain:mirror.cs.siue.edu)",
+      "Bash(deno cache:*)"
     ],
     "deny": []
   }

@@ -53,7 +53,17 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.x
+          deno-version: v2.1.x
+      
+      - name: Handle Deno lockfile
+        run: |
+          # Remove incompatible lockfile and let Deno recreate it
+          if [ -f "deno.lock" ]; then
+            echo "Removing existing lockfile to avoid version conflicts"
+            rm deno.lock
+          fi
+          # Cache dependencies
+          deno cache --reload scripts/build.ts
       
       - name: Cache Packer
         uses: actions/cache@v4
