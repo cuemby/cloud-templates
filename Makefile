@@ -28,7 +28,7 @@ help:
 build:
 	@if [ -z "$(NAME)" ]; then echo "Error: NAME is required. Use: make build NAME=template_name"; exit 1; fi
 	@if [ ! -f "${TEMPLATE_DIR}/${NAME}.pkr.hcl" ]; then echo "Error: Template ${NAME}.pkr.hcl not found in ${TEMPLATE_DIR}/."; exit 1; fi
-	cd ${TEMPLATE_DIR} && env PACKER_LOG=1 timeout ${TIMEOUT} packer build -var "name=${NAME}" ${NAME}.pkr.hcl
+	env PACKER_LOG=1 timeout ${TIMEOUT} packer build -var "name=${NAME}" ${TEMPLATE_DIR}/${NAME}.pkr.hcl
 
 build-all:
 	@if [ ! -d "${TEMPLATE_DIR}" ] || [ -z "$$(find ${TEMPLATE_DIR} -name '*.pkr.hcl' 2>/dev/null)" ]; then echo "No templates found in ${TEMPLATE_DIR}/."; exit 1; fi

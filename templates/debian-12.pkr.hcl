@@ -56,33 +56,33 @@ build {
   sources = ["source.qemu.debian-12"]
 
   provisioner "file" {
-    source          = "../config/files/apt/debian-12.sources"
+    source          = "config/files/apt/debian-12.sources"
     destination     = "/etc/apt/sources.list"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/cloud-init.cfg"
+    source          = "config/files/generic/cloud-init.cfg"
     destination     = "/etc/cloud/cloud.cfg"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/watchdog.conf"
+    source          = "config/files/generic/watchdog.conf"
     destination     = "/etc/watchdog.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/99-disable-ipv6-tempaddr.conf"
+    source          = "config/files/generic/99-disable-ipv6-tempaddr.conf"
     destination     = "/etc/sysctl.d/99-disable-ipv6-tempaddr.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/99-hotPlugCPU.rules"
+    source          = "config/files/generic/99-hotPlugCPU.rules"
     destination     = "/etc/udev/rules.d/99-hotPlugCPU.rules"
   }
 
   provisioner "shell" {
     scripts = [
-      "../scripts/debian-12/post.sh",
+      "scripts/debian-12/post.sh",
     ]
     execute_command = "sh '{{ .Path }}'"
   }

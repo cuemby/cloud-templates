@@ -169,3 +169,75 @@ make list-templates     # See available templates
 - [ ] Implement automated security scanning
 
 The modernization is complete and provides a solid foundation for maintaining and extending the CloudStack template system.
+
+---
+
+# Fix Packer Template File Path Issues
+
+## Problem
+The packer validation is failing because the templates are using incorrect relative paths (`../`) to reference config files and scripts. All the files exist in the correct locations, but the paths need to be corrected.
+
+## Analysis
+- Templates are in `templates/` directory
+- Config files are in `config/` directory  
+- Scripts are in `scripts/` directory
+- Current paths use `../config/` and `../scripts/` which resolve correctly from `templates/` directory
+- The issue seems to be that packer is running from a different working directory
+
+## Plan
+
+### ✅ Tasks to Complete
+
+- [ ] **Investigate current working directory issue**: Check how packer is being run and from which directory
+- [ ] **Fix ubuntu-24.04 template paths**: Update all file provisioner source paths to use correct relative paths
+- [ ] **Validate ubuntu-24.04 template**: Run packer validate to ensure it works
+- [ ] **Apply fixes to all other templates**: Update all distro templates with correct paths
+- [ ] **Update build scripts**: Ensure build process runs from correct directory
+- [ ] **Test complete workflow**: Validate all templates work properly
+
+### Strategy
+1. Keep changes simple and minimal - only fix the path references
+2. Maintain existing file structure - don't move files around
+3. Ensure all templates follow the same pattern
+4. Use relative paths that work from the project root directory
+
+## Notes
+- All required files exist in correct locations: config/, scripts/ directories
+- Issue is likely related to working directory when packer runs
+- Need to ensure consistent path resolution across all templates
+
+## ✅ RESOLUTION COMPLETED
+
+### Problem Identified
+The issue was an inconsistency in how Packer commands were executed:
+- `packer validate` ran from project root directory
+- `packer build` ran from `templates/` directory (via `cd ${TEMPLATE_DIR}`)
+- Templates used `../config/` and `../scripts/` paths which only worked when running from `templates/`
+
+### Solution Implemented
+1. **Fixed all template paths**: Updated 14 Packer HCL templates to use relative paths from project root
+   - Changed `../config/` → `config/`
+   - Changed `../scripts/` → `scripts/`
+   - Created automated script `tools/fix-template-paths.ts` for the fix
+
+2. **Updated Makefile consistency**: Modified build command to run from project root like validate
+   - Changed: `cd ${TEMPLATE_DIR} && ... packer build ${NAME}.pkr.hcl`
+   - To: `packer build ${TEMPLATE_DIR}/${NAME}.pkr.hcl`
+
+3. **Validated complete fix**: All 14 templates now validate successfully
+   - ✅ almalinux-8, almalinux-9, almalinux-10
+   - ✅ centos-7, centos-8
+   - ✅ cloudlinux-8, cloudlinux-9
+   - ✅ debian-10, debian-11, debian-12
+   - ✅ ubuntu-18.04, ubuntu-20.04, ubuntu-22.04, ubuntu-24.04
+
+### Changes Made
+- Modified 14 template files: Fixed all relative path references
+- Updated `Makefile`: Consistent working directory for build/validate
+- Created `tools/fix-template-paths.ts`: Reusable fix script
+- All file references now work from project root directory
+
+### Impact
+- **GitHub Actions will now work**: Template validation will succeed in CI
+- **Local development improved**: Consistent `make validate` and `make build` behavior
+- **Maintenance simplified**: All commands run from same working directory
