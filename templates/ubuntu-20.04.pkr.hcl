@@ -14,7 +14,7 @@ variable "name" {
 
 variable "url" {
   type    = string
-  default = "http://compute.o.auroraobjects.eu/iso/ubuntu-20.04.3-live-server-amd64.iso"
+  default = "https://releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso"
 }
 
 variable "iso_checksum" {

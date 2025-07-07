@@ -14,7 +14,7 @@ variable "name" {
 
 variable "url" {
   type    = string
-  default = "http://compute.o.auroraobjects.eu/iso/AlmaLinux-8.5-x86_64-boot.iso"
+  default = "https://repo.almalinux.org/almalinux/8/isos/x86_64/AlmaLinux-8.10-x86_64-boot.iso"
 }
 
 variable "iso_checksum" {

@@ -14,7 +14,7 @@ variable "name" {
 
 variable "url" {
   type    = string
-  default = "http://compute.o.auroraobjects.eu/iso/CloudLinux-8.9-x86_64-boot.iso"
+  default = "https://downloads.cloudlinux.com/cloudlinux/8/isos/x86_64/CloudLinux-8.10-x86_64-boot.iso"
 }
 
 variable "iso_checksum" {

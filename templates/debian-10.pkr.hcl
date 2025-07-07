@@ -14,7 +14,7 @@ variable "name" {
 
 variable "url" {
   type    = string
-  default = "http://compute.o.auroraobjects.eu/iso/debian-10.7.0-amd64-netinst.iso"
+  default = "https://cdimage.debian.org/debian-cd/10.13.0/amd64/iso-cd/debian-10.13.0-amd64-netinst.iso"
 }
 
 variable "iso_checksum" {
@@ -24,7 +24,7 @@ variable "iso_checksum" {
 
 variable "boot_command" {
   type    = list(string)
-  default = ["<esc><wait5>install <wait> preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed/debian-10.preseed debian-installer=en_US auto locale=en_US kbd-chooser/method=us keyboard-configuration/xkb-keymap=us netcfg/get_hostname=debian10 netcfg/get_domain=auroracompute.com fb=false debconf/frontend=noninteractive console-setup/ask_detect=false <wait> console-keymaps-at/keymap=us <wait><enter>"]
+  default = ["<esc><wait5>install <wait> preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed/debian-10.preseed debian-installer=en_US auto locale=en_US kbd-chooser/method=us keyboard-configuration/xkb-keymap=us netcfg/get_hostname=debian10 netcfg/get_domain=cloudstack.local fb=false debconf/frontend=noninteractive console-setup/ask_detect=false <wait> console-keymaps-at/keymap=us <wait><enter>"]
 }
 
 source "qemu" "debian-10" {

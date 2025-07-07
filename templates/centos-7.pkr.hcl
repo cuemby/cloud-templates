@@ -14,7 +14,7 @@ variable "name" {
 
 variable "url" {
   type    = string
-  default = "http://compute.o.auroraobjects.eu/iso/CentOS-7-x86_64-NetInstall-2009.iso"
+  default = "https://vault.centos.org/7.9.2009/isos/x86_64/CentOS-7-x86_64-NetInstall-2009.iso"
 }
 
 variable "iso_checksum" {
