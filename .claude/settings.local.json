@@ -31,7 +31,8 @@
       "Bash(gh run view:*)",
       "Bash(cp:*)",
       "Bash(mv:*)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(packer validate:*)"
     ],
     "deny": []
   }

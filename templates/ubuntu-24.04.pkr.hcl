@@ -43,7 +43,7 @@ source "qemu" "ubuntu-24-04" {
     "<del><del><del><del><del><del><del><del>",
     "<del><del><del><del><del><del><del><del>",
     "<del><del><del><del><del><del><del><del><del>",
-    "linux /casper/vmlinuz autoinstall ds="nocloud-net;seedfrom=http://{{ .HTTPIP }}:{{ .HTTPPort }}/" ---<enter><wait>",
+    "linux /casper/vmlinuz autoinstall ds=\"nocloud-net;seedfrom=http://{{ .HTTPIP }}:{{ .HTTPPort }}/\" ---<enter><wait>",
     "initrd /casper/initrd<enter><wait>",
     "boot<enter>",
     "<enter><f10><wait>",
@@ -57,7 +57,7 @@ source "qemu" "ubuntu-24-04" {
   http_directory       = "../config/files/ubuntu-24.04"
   http_port_min        = 8000
   http_port_max        = 8100
-  output_directory     = build_${var.name}
+  output_directory     = "build_${var.name}"
 }
 
 build {
