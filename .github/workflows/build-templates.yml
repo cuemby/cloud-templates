@@ -34,7 +34,7 @@ jobs:
           echo "has_changes=true" >> $GITHUB_OUTPUT
         elif [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
           # Build all templates on main branch push
-          templates=$(find templates -name "*.pkr.hcl" -exec basename {} .pkr.hcl \; | jq -R . | jq -s .)
+          templates=$(find templates -name "*.pkr.hcl" -exec basename {} .pkr.hcl \; | sort | jq -R . | jq -s . | jq -c .)
           echo "templates=${templates}" >> $GITHUB_OUTPUT
           echo "has_changes=true" >> $GITHUB_OUTPUT
         else
@@ -42,7 +42,7 @@ jobs:
           changed_files=$(git diff --name-only HEAD~1 HEAD | grep -E "(templates/|scripts/|config/)" | head -20)
           if [ -n "$changed_files" ]; then
             # Extract template names from changed files
-            templates=$(echo "$changed_files" | grep "templates/" | sed 's|templates/||' | sed 's|\.pkr\.hcl||' | sort -u | jq -R . | jq -s .)
+            templates=$(echo "$changed_files" | grep "templates/" | sed 's|templates/||' | sed 's|\.pkr\.hcl||' | sort -u | jq -R . | jq -s . | jq -c .)
             echo "templates=${templates}" >> $GITHUB_OUTPUT
             echo "has_changes=true" >> $GITHUB_OUTPUT
           else
