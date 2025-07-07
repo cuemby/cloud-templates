@@ -28,7 +28,10 @@
       "Bash(gh workflow list:*)",
       "Bash(gh workflow view:*)",
       "Bash(gh run list:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(make:*)"
     ],
     "deny": []
   }

@@ -1,0 +1,48 @@
+{
+  "imports": {
+    "@std/cli": "jsr:@std/cli@^1.0.6",
+    "@std/crypto": "jsr:@std/crypto@^1.0.3",
+    "@std/encoding": "jsr:@std/encoding@^1.0.5",
+    "@std/fs": "jsr:@std/fs@^1.0.17",
+    "@std/path": "jsr:@std/path@^1.0.8"
+  },
+  "tasks": {
+    "build": "echo 'Usage: deno task build <template-name>' && echo 'Example: deno task build ubuntu-22.04'",
+    "build-all": "deno run --allow-read --allow-write --allow-run tools/build-all-templates.ts",
+    "validate": "deno task validate-all",
+    "validate-all": "deno run --allow-read --allow-run tools/validate-templates.ts",
+    "register": "deno run --allow-env --allow-net --allow-read src/register-template.ts",
+    "list-templates": "find templates -name '*.pkr.hcl' -exec basename {} .pkr.hcl \\;",
+    "clean": "rm -rf build_* templates/build_*",
+    "regenerate": "deno run --allow-read --allow-write tools/regenerate-templates.ts",
+    "dev": "echo 'Self-contained development environment ready. Use individual tasks for building templates.'",
+    "init": "deno cache --reload $(find . -name '*.ts')",
+    "test": "deno test --allow-all",
+    "fmt": "deno fmt",
+    "lint": "deno lint",
+    "check": "deno check $(find . -name '*.ts')"
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true,
+    "proseWrap": "preserve",
+    "include": ["src/", "tools/", "*.ts", "*.js"],
+    "exclude": ["build_*", "templates/build_*"]
+  },
+  "lint": {
+    "include": ["src/", "tools/", "*.ts", "*.js"],
+    "exclude": ["build_*", "templates/build_*"],
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["ban-untagged-todo"],
+      "exclude": ["no-unused-vars"]
+    }
+  },
+  "test": {
+    "include": ["**/*_test.ts", "**/*_test.js", "test/**/*.ts", "test/**/*.js"],
+    "exclude": ["build_*", "templates/build_*"]
+  }
+}

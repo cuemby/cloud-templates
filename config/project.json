@@ -1,0 +1,28 @@
+{
+  "project": {
+    "name": "cloudstack-templates-modern",
+    "description": "Modern, self-contained CloudStack Packer templates with HCL syntax",
+    "version": "1.0.0"
+  },
+  "structure": {
+    "templates": "templates",
+    "scripts": "scripts", 
+    "files": "config/files",
+    "tools": "tools",
+    "source": "src"
+  },
+  "features": {
+    "hcl_templates": true,
+    "github_actions": true,
+    "github_packages": true,
+    "typescript_tooling": true,
+    "self_contained": true
+  },
+  "templates": {
+    "ubuntu": ["18.04", "20.04", "22.04", "24.04"],
+    "debian": ["10", "11", "12"],
+    "centos": ["7", "8"],
+    "almalinux": ["8", "9", "10"],
+    "cloudlinux": ["8", "9"]
+  }
+}

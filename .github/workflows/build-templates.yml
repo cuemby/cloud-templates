@@ -1,0 +1,174 @@
+name: Build CloudStack Templates - Modern Edition
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      template_name:
+        description: 'Template name to build (e.g., ubuntu-22.04)'
+        required: false
+        type: string
+
+env:
+  PACKER_VERSION: "1.9.4"
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      templates: ${{ steps.changes.outputs.templates }}
+      has_changes: ${{ steps.changes.outputs.has_changes }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Detect changed templates
+      id: changes
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.template_name }}" ]; then
+          echo "templates=[\"${{ github.event.inputs.template_name }}\"]" >> $GITHUB_OUTPUT
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          # Build all templates on main branch push
+          templates=$(find templates -name "*.pkr.hcl" -exec basename {} .pkr.hcl \; | jq -R . | jq -s .)
+          echo "templates=${templates}" >> $GITHUB_OUTPUT
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+        else
+          # For PRs, only build changed templates
+          changed_files=$(git diff --name-only HEAD~1 HEAD | grep -E "(templates/|scripts/|config/)" | head -20)
+          if [ -n "$changed_files" ]; then
+            # Extract template names from changed files
+            templates=$(echo "$changed_files" | grep "templates/" | sed 's|templates/||' | sed 's|\.pkr\.hcl||' | sort -u | jq -R . | jq -s .)
+            echo "templates=${templates}" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "templates=[]" >> $GITHUB_OUTPUT
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+        fi
+
+  build:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        template: ${{ fromJson(needs.detect-changes.outputs.templates) }}
+      fail-fast: false
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Packer
+      uses: hashicorp/setup-packer@main
+      with:
+        version: ${{ env.PACKER_VERSION }}
+    
+    - name: Install QEMU
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qemu-system-x86 qemu-utils
+    
+    - name: Validate Packer template
+      run: |
+        packer validate templates/${{ matrix.template }}.pkr.hcl
+    
+    - name: Build template
+      run: |
+        cd templates
+        PACKER_LOG=1 timeout 240m packer build -var "name=${{ matrix.template }}" ${{ matrix.template }}.pkr.hcl
+    
+    - name: Generate metadata
+      run: |
+        cd templates
+        build_dir="build_${{ matrix.template }}"
+        if [ -d "$build_dir" ]; then
+          # Create additional metadata
+          echo "Template: ${{ matrix.template }}" > "$build_dir/build-info.txt"
+          echo "Build Date: $(date -u)" >> "$build_dir/build-info.txt"
+          echo "Git Commit: ${{ github.sha }}" >> "$build_dir/build-info.txt"
+          echo "Build Number: ${{ github.run_number }}" >> "$build_dir/build-info.txt"
+          echo "Built From: Modern CloudStack Templates" >> "$build_dir/build-info.txt"
+          
+          # Extract OS info for tagging
+          OS_CATEGORY=$(echo "${{ matrix.template }}" | cut -d'-' -f1)
+          OS_VERSION=$(echo "${{ matrix.template }}" | cut -d'-' -f2-)
+          
+          echo "OS_CATEGORY=$OS_CATEGORY" >> $GITHUB_ENV
+          echo "OS_VERSION=$OS_VERSION" >> $GITHUB_ENV
+        fi
+    
+    - name: Upload to GitHub Packages
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        cd templates
+        build_dir="build_${{ matrix.template }}"
+        if [ -d "$build_dir" ]; then
+          # Create a tarball for the template
+          tar -czf "${{ matrix.template }}.tar.gz" -C "$build_dir" .
+          
+          # Upload to GitHub Packages using GitHub CLI
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          
+          # Create release if it doesn't exist
+          gh release create "v${{ github.run_number }}" --title "Modern Template Build ${{ github.run_number }}" --notes "Automated template build from modern CloudStack templates (commit ${{ github.sha }})" || true
+          
+          # Upload the template artifact
+          gh release upload "v${{ github.run_number }}" "${{ matrix.template }}.tar.gz" --clobber
+        fi
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ${{ matrix.template }}-build
+        path: |
+          templates/build_${{ matrix.template }}/
+        retention-days: 30
+
+  deploy:
+    needs: [detect-changes, build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        template: ${{ fromJson(needs.detect-changes.outputs.templates) }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: v1.x
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ matrix.template }}-build
+        path: build_${{ matrix.template }}
+    
+    - name: Deploy to CloudStack
+      env:
+        CLOUDSTACK_PROFILES: ${{ secrets.CLOUDSTACK_PROFILES }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Use the new Deno-based registration script
+        if [ -f "src/register-template.ts" ]; then
+          # Extract manifest data
+          manifest_file="build_${{ matrix.template }}/${{ matrix.template }}.json"
+          if [ -f "$manifest_file" ]; then
+            # Get download URL from GitHub release
+            download_url=$(gh release view "v${{ github.run_number }}" --json assets --jq '.assets[] | select(.name == "${{ matrix.template }}.tar.gz") | .url')
+            
+            # Run registration script
+            deno run --allow-env --allow-net --allow-read src/register-template.ts \
+              --name "${{ matrix.template }}" \
+              --url "$download_url" \
+              --manifest "$manifest_file"
+          fi
+        fi
