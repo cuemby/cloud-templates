@@ -59,48 +59,48 @@ build {
   sources = ["source.qemu.almalinux-10"]
 
   provisioner "file" {
-    source          = "config/files/generic/cloud-init.cfg"
+    source          = "../config/files/generic/cloud-init.cfg"
     destination     = "/etc/cloud/cloud.cfg"
   }
 
   provisioner "file" {
-    source          = "config/files/generic/watchdog.conf"
+    source          = "../config/files/generic/watchdog.conf"
     destination     = "/etc/watchdog.conf"
   }
 
   provisioner "file" {
-    source          = "config/files/generic/99-disable-ipv6-tempaddr.conf"
+    source          = "../config/files/generic/99-disable-ipv6-tempaddr.conf"
     destination     = "/etc/sysctl.d/99-disable-ipv6-tempaddr.conf"
   }
 
   provisioner "file" {
-    source          = "config/files/generic/99-hotPlugCPU.rules"
+    source          = "../config/files/generic/99-hotPlugCPU.rules"
     destination     = "/etc/udev/rules.d/99-hotPlugCPU.rules"
   }
 
   provisioner "file" {
-    source          = "config/files/centos/90-dns-none.conf"
+    source          = "../config/files/centos/90-dns-none.conf"
     destination     = "/etc/NetworkManager/conf.d/90-dns-none.conf"
   }
 
   provisioner "file" {
-    source          = "config/files/centos/grub"
+    source          = "../config/files/centos/grub"
     destination     = "/etc/default/grub"
   }
 
   provisioner "file" {
-    source          = "config/files/patches/DataSourceCloudStack.patch"
+    source          = "../config/files/patches/DataSourceCloudStack.patch"
     destination     = "/tmp/DataSourceCloudStack.patch"
   }
 
   provisioner "file" {
-    source          = "config/files/patches/net_dhcp.patch"
+    source          = "../config/files/patches/net_dhcp.patch"
     destination     = "/tmp/net_dhcp.patch"
   }
 
   provisioner "shell" {
     scripts = [
-      "scripts/almalinux-10/post.sh",
+      "../scripts/almalinux-10/post.sh",
     ]
     execute_command = "sh '{{ .Path }}'"
   }

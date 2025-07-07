@@ -64,7 +64,7 @@ source "qemu" "ubuntu-22-04" {
   ssh_password         = "58p5wMfpyTQhqa4Q"
   ssh_handshake_attempts = "300"
   pause_before_connecting = "2m"
-  http_directory       = "config/files/ubuntu-22.04"
+  http_directory       = "../config/files/ubuntu-22.04"
   http_port_min        = 8000
   http_port_max        = 8100
   output_directory     = "build_${var.name}"
@@ -74,45 +74,45 @@ build {
   sources = ["source.qemu.ubuntu-22-04"]
 
   provisioner "file" {
-    source          = "config/files/apt/ubuntu-22.04.sources"
+    source          = "../config/files/apt/ubuntu-22.04.sources"
     destination     = "/etc/apt/sources.list"
   }
 
   provisioner "file" {
-    source          = "config/files/generic/cloud-init.cfg"
+    source          = "../config/files/generic/cloud-init.cfg"
     destination     = "/etc/cloud/cloud.cfg"
   }
 
   provisioner "file" {
-    source          = "config/files/generic/watchdog.conf"
+    source          = "../config/files/generic/watchdog.conf"
     destination     = "/etc/watchdog.conf"
   }
 
   provisioner "file" {
-    source          = "config/files/ubuntu-22.04/01-netcfg.yaml"
+    source          = "../config/files/ubuntu-22.04/01-netcfg.yaml"
     destination     = "/etc/netplan/01-netcfg.yaml"
   }
 
   provisioner "file" {
-    source          = "config/files/generic/99-disable-ipv6-tempaddr.conf"
+    source          = "../config/files/generic/99-disable-ipv6-tempaddr.conf"
     destination     = "/etc/sysctl.d/99-disable-ipv6-tempaddr.conf"
   }
 
   provisioner "file" {
-    source          = "config/files/generic/99-hotPlugCPU.rules"
+    source          = "../config/files/generic/99-hotPlugCPU.rules"
     destination     = "/etc/udev/rules.d/99-hotPlugCPU.rules"
   }
 
   provisioner "shell" {
     scripts = [
-      "scripts/ubuntu-22.04/remove-swap.sh",
+      "../scripts/ubuntu-22.04/remove-swap.sh",
     ]
     execute_command = "sh '{{ .Path }}'"
   }
 
   provisioner "shell" {
     scripts = [
-      "scripts/ubuntu-22.04/post.sh",
+      "../scripts/ubuntu-22.04/post.sh",
     ]
     execute_command = "sudo sh '{{ .Path }}'"
   }

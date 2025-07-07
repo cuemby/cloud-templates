@@ -56,40 +56,40 @@ build {
   sources = ["source.qemu.ubuntu-18-04"]
 
   provisioner "file" {
-    source          = "config/files/apt/ubuntu-18.04.sources"
+    source          = "../config/files/apt/ubuntu-18.04.sources"
     destination     = "/etc/apt/sources.list"
   }
 
   provisioner "file" {
-    source          = "config/files/generic/cloud-init.cfg"
+    source          = "../config/files/generic/cloud-init.cfg"
     destination     = "/etc/cloud/cloud.cfg"
   }
 
   provisioner "file" {
-    source          = "config/files/generic/watchdog.conf"
+    source          = "../config/files/generic/watchdog.conf"
     destination     = "/etc/watchdog.conf"
   }
 
   provisioner "file" {
-    source          = "config/files/generic/99-disable-ipv6-tempaddr.conf"
+    source          = "../config/files/generic/99-disable-ipv6-tempaddr.conf"
     destination     = "/etc/sysctl.d/99-disable-ipv6-tempaddr.conf"
   }
 
   provisioner "file" {
-    source          = "config/files/generic/99-hotPlugCPU.rules"
+    source          = "../config/files/generic/99-hotPlugCPU.rules"
     destination     = "/etc/udev/rules.d/99-hotPlugCPU.rules"
   }
 
   provisioner "shell" {
     scripts = [
-      "scripts/ubuntu-18.04/remove-swap.sh",
+      "../scripts/ubuntu-18.04/remove-swap.sh",
     ]
     execute_command = "sh '{{ .Path }}'"
   }
 
   provisioner "shell" {
     scripts = [
-      "scripts/ubuntu-18.04/post.sh",
+      "../scripts/ubuntu-18.04/post.sh",
     ]
     execute_command = "sh '{{ .Path }}'"
   }
