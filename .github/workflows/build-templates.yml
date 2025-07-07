@@ -77,11 +77,15 @@ jobs:
           unzip packer.zip
           sudo mv packer /usr/local/bin/
           packer version
+          
+      - name: Install Packer plugins
+        run: |
+          packer plugins install github.com/hashicorp/qemu
       
-      - name: Install QEMU/KVM
+      - name: Install QEMU/KVM and Xvfb
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-kvm qemu-utils libvirt-daemon-system libvirt-clients bridge-utils virt-manager
+          sudo apt-get install -y qemu-kvm qemu-utils libvirt-daemon-system libvirt-clients bridge-utils virt-manager xvfb
           sudo modprobe kvm_intel || sudo modprobe kvm_amd || true
           sudo chown root:kvm /dev/kvm
           sudo chmod 666 /dev/kvm

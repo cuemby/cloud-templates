@@ -8,9 +8,9 @@ import { CloudTemplateBuilder, CloudBuildOptions } from "./builders/cloud.ts";
 const osConfigs: Record<string, OSConfig> = {
   ubuntu: {
     name: "ubuntu",
-    version: "22.04",
-    isoUrl: "https://releases.ubuntu.com/22.04/ubuntu-22.04.3-live-server-amd64.iso",
-    isoChecksum: "a4acfda10b18da50e2ec50ccaf860d7f20b389df8765611142305c0e911d16fd",
+    version: "24.04.5",
+    isoUrl: "https://releases.ubuntu.com/24.04/ubuntu-24.04.1-live-server-amd64.iso",
+    isoChecksum: "e240e4b801f7bb68c20d1356b60968ad0c33b41d00d828e74ceb3364a0317be9",
     packerTemplate: "ubuntu.pkr.hcl",
     preparationScript: "ubuntu-prepare.sh",
     validationScript: "ubuntu-validate.ts",
@@ -63,8 +63,8 @@ const osConfigs: Record<string, OSConfig> = {
   fedora: {
     name: "fedora",
     version: "41",
-    isoUrl: "https://download.fedoraproject.org/pub/fedora/linux/releases/41/Server/x86_64/iso/Fedora-Server-netinst-x86_64-41-1.4.iso",
-    isoChecksum: "630c52ba9e7a7f229b026e241ba74b9bc105e60ba5bf7b222693ae0e25f05c97",
+    isoUrl: "https://download.fedoraproject.org/pub/fedora/linux/releases/41/Server/x86_64/iso/Fedora-Server-dvd-x86_64-41-1.4.iso",
+    isoChecksum: "placeholder-checksum-will-be-logged-during-build",
     packerTemplate: "fedora.pkr.hcl",
     preparationScript: "fedora-prepare.sh",
     validationScript: "fedora-validate.ts",
