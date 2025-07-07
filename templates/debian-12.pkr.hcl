@@ -1,3 +1,12 @@
+packer {
+  required_plugins {
+    qemu = {
+      source  = "github.com/hashicorp/qemu"
+      version = "~> 1"
+    }
+  }
+}
+
 variable "name" {
   type    = string
   default = "debian-12"
@@ -14,8 +23,8 @@ variable "iso_checksum" {
 }
 
 variable "boot_command" {
-  type    = string
-  default = "<wait5><esc>auto preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed/debian-12.preseed<enter>"
+  type    = list(string)
+  default = ["<wait5><esc>auto preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed/debian-12.preseed<enter>"]
 }
 
 source "qemu" "debian-12" {
@@ -40,40 +49,40 @@ source "qemu" "debian-12" {
   http_directory       = "files"
   http_port_min        = 8000
   http_port_max        = 8100
-  output_directory     = build_${var.name}
+  output_directory     = "build_${var.name}"
 }
 
 build {
   sources = ["source.qemu.debian-12"]
 
   provisioner "file" {
-    source          = "../config/files/apt/debian-12.sources"
+    source          = "config/files/apt/debian-12.sources"
     destination     = "/etc/apt/sources.list"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/cloud-init.cfg"
+    source          = "config/files/generic/cloud-init.cfg"
     destination     = "/etc/cloud/cloud.cfg"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/watchdog.conf"
+    source          = "config/files/generic/watchdog.conf"
     destination     = "/etc/watchdog.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/99-disable-ipv6-tempaddr.conf"
+    source          = "config/files/generic/99-disable-ipv6-tempaddr.conf"
     destination     = "/etc/sysctl.d/99-disable-ipv6-tempaddr.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/99-hotPlugCPU.rules"
+    source          = "config/files/generic/99-hotPlugCPU.rules"
     destination     = "/etc/udev/rules.d/99-hotPlugCPU.rules"
   }
 
   provisioner "shell" {
     scripts = [
-      "../scripts/debian-12/post.sh",
+      "scripts/debian-12/post.sh",
     ]
     execute_command = "sh '{{ .Path }}'"
   }

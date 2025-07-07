@@ -1,3 +1,12 @@
+packer {
+  required_plugins {
+    qemu = {
+      source  = "github.com/hashicorp/qemu"
+      version = "~> 1"
+    }
+  }
+}
+
 variable "name" {
   type    = string
   default = "cloudlinux-8"
@@ -14,8 +23,8 @@ variable "iso_checksum" {
 }
 
 variable "boot_command" {
-  type    = string
-  default = "<tab> inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/kickstart/cloudlinux-8.ks<enter><wait>"
+  type    = list(string)
+  default = ["<tab> inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/kickstart/cloudlinux-8.ks<enter><wait>"]
 }
 
 source "qemu" "cloudlinux-8" {
@@ -40,50 +49,50 @@ source "qemu" "cloudlinux-8" {
   http_directory       = "files"
   http_port_min        = 8000
   http_port_max        = 8100
-  output_directory     = build_${var.name}
+  output_directory     = "build_${var.name}"
 }
 
 build {
   sources = ["source.qemu.cloudlinux-8"]
 
   provisioner "file" {
-    source          = "../config/files/generic/cloud-init.cfg"
+    source          = "config/files/generic/cloud-init.cfg"
     destination     = "/etc/cloud/cloud.cfg"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/watchdog.conf"
+    source          = "config/files/generic/watchdog.conf"
     destination     = "/etc/watchdog.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/99-disable-ipv6-tempaddr.conf"
+    source          = "config/files/generic/99-disable-ipv6-tempaddr.conf"
     destination     = "/etc/sysctl.d/99-disable-ipv6-tempaddr.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/99-hotPlugCPU.rules"
+    source          = "config/files/generic/99-hotPlugCPU.rules"
     destination     = "/etc/udev/rules.d/99-hotPlugCPU.rules"
   }
 
   provisioner "file" {
-    source          = "../config/files/centos/90-dns-none.conf"
+    source          = "config/files/centos/90-dns-none.conf"
     destination     = "/etc/NetworkManager/conf.d/90-dns-none.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/centos/90-dhcp-client.conf"
+    source          = "config/files/centos/90-dhcp-client.conf"
     destination     = "/etc/NetworkManager/conf.d/90-dhcp-client.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/centos/grub"
+    source          = "config/files/centos/grub"
     destination     = "/etc/default/grub"
   }
 
   provisioner "shell" {
     scripts = [
-      "../scripts/cloudlinux-8/post.sh",
+      "scripts/cloudlinux-8/post.sh",
     ]
     execute_command = "sh '{{ .Path }}'"
   }

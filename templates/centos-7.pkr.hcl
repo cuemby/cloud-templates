@@ -1,3 +1,12 @@
+packer {
+  required_plugins {
+    qemu = {
+      source  = "github.com/hashicorp/qemu"
+      version = "~> 1"
+    }
+  }
+}
+
 variable "name" {
   type    = string
   default = "centos-7"
@@ -14,8 +23,8 @@ variable "iso_checksum" {
 }
 
 variable "boot_command" {
-  type    = string
-  default = "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/kickstart/centos-7.ks<enter><wait>"
+  type    = list(string)
+  default = ["<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/kickstart/centos-7.ks<enter><wait>"]
 }
 
 source "qemu" "centos-7" {
@@ -40,40 +49,40 @@ source "qemu" "centos-7" {
   http_directory       = "files"
   http_port_min        = 8000
   http_port_max        = 8100
-  output_directory     = build_${var.name}
+  output_directory     = "build_${var.name}"
 }
 
 build {
   sources = ["source.qemu.centos-7"]
 
   provisioner "file" {
-    source          = "../config/files/generic/cloud-init.cfg"
+    source          = "config/files/generic/cloud-init.cfg"
     destination     = "/etc/cloud/cloud.cfg"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/watchdog.conf"
+    source          = "config/files/generic/watchdog.conf"
     destination     = "/etc/watchdog.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/99-disable-ipv6-tempaddr.conf"
+    source          = "config/files/generic/99-disable-ipv6-tempaddr.conf"
     destination     = "/etc/sysctl.d/99-disable-ipv6-tempaddr.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/99-hotPlugCPU.rules"
+    source          = "config/files/generic/99-hotPlugCPU.rules"
     destination     = "/etc/udev/rules.d/99-hotPlugCPU.rules"
   }
 
   provisioner "file" {
-    source          = "../config/files/centos/90-dns-none.conf"
+    source          = "config/files/centos/90-dns-none.conf"
     destination     = "/etc/NetworkManager/conf.d/90-dns-none.conf"
   }
 
   provisioner "shell" {
     scripts = [
-      "../scripts/centos-7/post.sh",
+      "scripts/centos-7/post.sh",
     ]
     execute_command = "sh '{{ .Path }}'"
   }

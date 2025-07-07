@@ -1,3 +1,12 @@
+packer {
+  required_plugins {
+    qemu = {
+      source  = "github.com/hashicorp/qemu"
+      version = "~> 1"
+    }
+  }
+}
+
 variable "name" {
   type    = string
   default = "ubuntu-18.04"
@@ -14,8 +23,8 @@ variable "iso_checksum" {
 }
 
 variable "boot_command" {
-  type    = string
-  default = "<esc><wait><esc><wait><enter><wait>/install/vmlinuz initrd=/install/initrd.gz preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed/ubuntu-18.04.preseed auto debian-installer=en_US locale=en_US kbd-chooser/method=us fb=false debconf/frontend=noninteractive keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA keyboard-configuration/variant=USA console-setup/ask_detect=false hostname=ubuntu1804 -- <enter>"
+  type    = list(string)
+  default = ["<esc><wait><esc><wait><enter><wait>/install/vmlinuz initrd=/install/initrd.gz preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed/ubuntu-18.04.preseed auto debian-installer=en_US locale=en_US kbd-chooser/method=us fb=false debconf/frontend=noninteractive keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA keyboard-configuration/variant=USA console-setup/ask_detect=false hostname=ubuntu1804 -- <enter>"]
 }
 
 source "qemu" "ubuntu-18-04" {
@@ -40,47 +49,47 @@ source "qemu" "ubuntu-18-04" {
   http_directory       = "files"
   http_port_min        = 8000
   http_port_max        = 8100
-  output_directory     = build_${var.name}
+  output_directory     = "build_${var.name}"
 }
 
 build {
   sources = ["source.qemu.ubuntu-18-04"]
 
   provisioner "file" {
-    source          = "../config/files/apt/ubuntu-18.04.sources"
+    source          = "config/files/apt/ubuntu-18.04.sources"
     destination     = "/etc/apt/sources.list"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/cloud-init.cfg"
+    source          = "config/files/generic/cloud-init.cfg"
     destination     = "/etc/cloud/cloud.cfg"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/watchdog.conf"
+    source          = "config/files/generic/watchdog.conf"
     destination     = "/etc/watchdog.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/99-disable-ipv6-tempaddr.conf"
+    source          = "config/files/generic/99-disable-ipv6-tempaddr.conf"
     destination     = "/etc/sysctl.d/99-disable-ipv6-tempaddr.conf"
   }
 
   provisioner "file" {
-    source          = "../config/files/generic/99-hotPlugCPU.rules"
+    source          = "config/files/generic/99-hotPlugCPU.rules"
     destination     = "/etc/udev/rules.d/99-hotPlugCPU.rules"
   }
 
   provisioner "shell" {
     scripts = [
-      "../scripts/ubuntu-18.04/remove-swap.sh",
+      "scripts/ubuntu-18.04/remove-swap.sh",
     ]
     execute_command = "sh '{{ .Path }}'"
   }
 
   provisioner "shell" {
     scripts = [
-      "../scripts/ubuntu-18.04/post.sh",
+      "scripts/ubuntu-18.04/post.sh",
     ]
     execute_command = "sh '{{ .Path }}'"
   }
