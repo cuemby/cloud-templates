@@ -15,9 +15,11 @@
     "clean": "deno run --allow-env --allow-read --allow-write --allow-run scripts/clean.ts",
     "status": "deno run --allow-env --allow-read scripts/status.ts",
     "test": "deno test --allow-env --allow-read --allow-write --allow-run",
+    "test:cloud": "deno run --allow-env --allow-read --allow-write --allow-run scripts/test-cloud-build.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
-    "check": "deno check **/*.ts"
+    "check": "deno check **/*.ts",
+    "ci": "deno task check && deno task lint && deno task test"
   },
   "imports": {
     "@std/fs": "jsr:@std/fs@^1.0.17",

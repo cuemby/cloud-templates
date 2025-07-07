@@ -2,6 +2,7 @@
 
 import { join } from "@std/path";
 import { BaseTemplateBuilder, OSConfig, BuildOptions } from "./builders/base.ts";
+import { CloudTemplateBuilder, CloudBuildOptions } from "./builders/cloud.ts";
 
 // OS configurations for each supported system
 const osConfigs: Record<string, OSConfig> = {
@@ -86,14 +87,18 @@ async function main(): Promise<void> {
     Deno.exit(1);
   }
 
-  const buildOptions: BuildOptions = {
+  const buildOptions: CloudBuildOptions = {
     outputDir: join(Deno.cwd(), "templates", osName, "output"),
     format: (Deno.env.get("PACKER_FORMAT") as "qcow2" | "vhd" | "ova") || "qcow2",
     skipValidation: Deno.env.get("SKIP_VALIDATION") === "true",
     cleanup: Deno.env.get("CLEANUP") !== "false",
+    isCloudBuild: !!(Deno.env.get("GITHUB_ACTIONS") || Deno.env.get("CI")),
   };
 
-  const builder = new BaseTemplateBuilder(osConfig, buildOptions);
+  // Use cloud builder for CI/CD environments, local builder otherwise
+  const builder = buildOptions.isCloudBuild 
+    ? new CloudTemplateBuilder(osConfig, buildOptions)
+    : new BaseTemplateBuilder(osConfig, buildOptions as BuildOptions);
   
   try {
     await builder.build();

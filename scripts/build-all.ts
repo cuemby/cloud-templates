@@ -35,7 +35,7 @@ async function buildOS(osName: string): Promise<BuildResult> {
     return {
       os: osName,
       success: false,
-      error: error.toString(),
+      error: error instanceof Error ? error.message : String(error),
       duration,
     };
   }

@@ -43,6 +43,9 @@ source "qemu" "ubuntu" {
   net_device        = "virtio-net"
   disk_interface    = "virtio"
   boot_wait         = "5s"
+  headless          = true
+  use_default_display = false
+  display           = "none"
   boot_command = [
     "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",
     "<spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait><spacebar><wait>",

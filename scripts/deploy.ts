@@ -55,6 +55,8 @@ class CloudStackDeployer {
   private async startHttpServer(filePath: string): Promise<void> {
     console.log(`📡 Starting HTTP server on port ${this.httpPort}...`);
     
+    const fileName = filePath.split('/').pop() || 'template';
+    
     const handler = async (req: Request): Promise<Response> => {
       const url = new URL(req.url);
       
@@ -66,7 +68,7 @@ class CloudStackDeployer {
           return new Response(readableStream, {
             headers: {
               "Content-Type": "application/octet-stream",
-              "Content-Disposition": `attachment; filename="${templateInfo.name}"`,
+              "Content-Disposition": `attachment; filename="${fileName}"`,
             },
           });
         } catch (error) {
