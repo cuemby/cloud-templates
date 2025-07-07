@@ -38,11 +38,13 @@ source "qemu" "almalinux" {
   http_directory    = "templates/almalinux/http"
   ssh_username      = "packer"
   ssh_password      = "packer"
-  ssh_timeout       = "20m"
+  ssh_timeout       = "30m"
+  ssh_handshake_attempts = 100
+  ssh_pty = true
   vm_name           = var.vm_name
   net_device        = "virtio-net"
   disk_interface    = "virtio"
-  boot_wait         = "10s"
+  boot_wait         = "15s"
   boot_command = [
     "<tab> text ks=http://{{.HTTPIP}}:{{.HTTPPort}}/ks.cfg<enter><wait>"
   ]

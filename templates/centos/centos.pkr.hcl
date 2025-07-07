@@ -38,7 +38,9 @@ source "qemu" "centos" {
   http_directory    = "templates/centos/http"
   ssh_username      = "packer"
   ssh_password      = "packer"
-  ssh_timeout       = "20m"
+  ssh_timeout       = "30m"
+  ssh_handshake_attempts = 100
+  ssh_pty = true
   vm_name           = var.vm_name
   net_device        = "virtio-net"
   disk_interface    = "virtio"

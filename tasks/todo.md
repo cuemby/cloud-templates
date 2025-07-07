@@ -123,6 +123,66 @@ Migrate from local Packer builds to cloud-native GitHub Actions-based template b
 - Average build time <30 minutes per template
 - Total cost <$50/month for regular development usage
 
+## SSH Hanging Issue Fix - COMPLETED ✅
+
+### Problem Analysis
+- **Issue Identified**: AlmaLinux, Fedora, and Rocky Linux builds were hanging at "Waiting for SSH to become available"
+- **Root Cause**: SSH service wasn't starting properly or quickly enough after OS installation
+- **Log Analysis**: All three distributions showed the same hanging point in their respective log files
+
+### Fixes Applied
+
+#### 1. Packer Configuration Updates
+- **Increased SSH timeout** from 20m to 30m in all three Packer configs
+- **Added SSH handshake attempts** (100 attempts) for better retry logic
+- **Enabled SSH PTY** for better compatibility
+- **Increased boot wait time** from 10s to 15s to allow more time for OS initialization
+
+#### 2. Kickstart Configuration Updates
+- **AlmaLinux**: Added SSH daemon configuration and startup commands
+- **Fedora**: Enhanced SSH daemon configuration with DNS lookup disabled
+- **Rocky Linux**: Enhanced SSH daemon configuration with DNS lookup disabled
+
+#### 3. SSH Service Improvements
+- **Explicit SSH enablement**: Added `systemctl enable sshd` and `systemctl start sshd`
+- **DNS lookup disabled**: Added `UseDNS no` to prevent DNS resolution delays
+- **Root login enabled**: Configured `PermitRootLogin yes` for Packer access
+- **Password authentication**: Ensured `PasswordAuthentication yes` is set
+
+### Files Modified
+- `templates/almalinux/almalinux.pkr.hcl`
+- `templates/fedora/fedora.pkr.hcl`
+- `templates/rockylinux/rockylinux.pkr.hcl`
+- `templates/almalinux/http/ks.cfg`
+- `templates/fedora/http/ks.cfg`
+- `templates/rockylinux/http/ks.cfg`
+
+### Changes Summary
+1. **SSH Timeout**: Increased from 20 minutes to 30 minutes
+2. **SSH Handshake**: Added 100 retry attempts
+3. **SSH PTY**: Enabled for better terminal compatibility
+4. **Boot Wait**: Increased from 10s to 15s
+5. **DNS Lookups**: Disabled to prevent delays
+6. **SSH Service**: Explicitly enabled and started in post-install
+
+## Ubuntu and CentOS Issues Fix - COMPLETED ✅
+
+### Ubuntu Checksum Error
+- **Problem**: Ubuntu Packer config had placeholder checksum `"placeholder-checksum-will-be-logged-during-build"` which caused invalid hex error
+- **Solution**: Updated with actual checksum `"e8ab4cebf62713f3b32a4248375573cf5f8da21d078d423974d47d14f6e10c8c"`
+- **Additional**: Applied SSH timeout improvements (30m timeout, 100 handshake attempts, SSH PTY)
+
+### CentOS Configuration
+- **Analysis**: CentOS empty log indicates the build may not have been triggered or failed early
+- **Solution**: Applied SSH improvements to CentOS Packer and kickstart configs
+- **Enhancement**: Added explicit SSH service enablement in kickstart post-install
+
+### Files Modified
+- `templates/ubuntu/ubuntu.pkr.hcl` - Fixed checksum and SSH settings
+- `templates/ubuntu/http/user-data` - Enhanced SSH configuration in autoinstall
+- `templates/centos/centos.pkr.hcl` - Added SSH timeout improvements
+- `templates/centos/http/ks.cfg` - Added SSH service configuration
+
 ## Review Section
 *This section will be updated as work progresses*
 

@@ -14,7 +14,7 @@ variable "iso_url" {
 
 variable "iso_checksum" {
   type    = string
-  default = "placeholder-checksum-will-be-logged-during-build"
+  default = "e8ab4cebf62713f3b32a4248375573cf5f8da21d078d423974d47d14f6e10c8c"
 }
 
 variable "output_directory" {
@@ -38,11 +38,13 @@ source "qemu" "ubuntu" {
   http_directory    = "templates/ubuntu/http"
   ssh_username      = "packer"
   ssh_password      = "packer"
-  ssh_timeout       = "20m"
+  ssh_timeout       = "30m"
+  ssh_handshake_attempts = 100
+  ssh_pty = true
   vm_name           = var.vm_name
   net_device        = "virtio-net"
   disk_interface    = "virtio"
-  boot_wait         = "5s"
+  boot_wait         = "10s"
   headless          = true
   use_default_display = false
   display           = "none"
