@@ -83,12 +83,10 @@ jobs:
     
     - name: Build template
       run: |
-        cd templates
-        PACKER_LOG=1 timeout 240m packer build -var "name=${{ matrix.template }}" ${{ matrix.template }}.pkr.hcl
+        PACKER_LOG=1 timeout 240m packer build -var "name=${{ matrix.template }}" templates/${{ matrix.template }}.pkr.hcl
     
     - name: Generate metadata
       run: |
-        cd templates
         build_dir="build_${{ matrix.template }}"
         if [ -d "$build_dir" ]; then
           # Create additional metadata
@@ -109,7 +107,6 @@ jobs:
     - name: Upload to GitHub Packages
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: |
-        cd templates
         build_dir="build_${{ matrix.template }}"
         if [ -d "$build_dir" ]; then
           # Create a tarball for the template
@@ -131,7 +128,7 @@ jobs:
       with:
         name: ${{ matrix.template }}-build
         path: |
-          templates/build_${{ matrix.template }}/
+          build_${{ matrix.template }}/
         retention-days: 30
 
   deploy:

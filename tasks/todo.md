@@ -241,3 +241,25 @@ The issue was an inconsistency in how Packer commands were executed:
 - **GitHub Actions will now work**: Template validation will succeed in CI
 - **Local development improved**: Consistent `make validate` and `make build` behavior
 - **Maintenance simplified**: All commands run from same working directory
+
+## ✅ SECOND ISSUE RESOLUTION
+
+### Additional Problem Found
+After fixing the templates, GitHub Actions was still failing because the workflow was using `cd templates` before running packer commands, but our templates now expect to run from project root.
+
+### Additional Solution Implemented
+1. **Fixed GitHub Actions workflow**: Updated `.github/workflows/build-templates.yml`
+   - Removed `cd templates` commands from build, metadata, and upload steps
+   - Updated all paths to work from project root directory
+   - Changed `packer build ${{ matrix.template }}.pkr.hcl` → `packer build templates/${{ matrix.template }}.pkr.hcl`
+   - Updated artifact paths from `templates/build_${{ matrix.template }}/` → `build_${{ matrix.template }}/`
+
+2. **Ensured consistency**: Both local development and CI now run from project root
+
+### Final Status
+- ✅ All 14 Packer templates validate locally from project root
+- ✅ GitHub Actions workflow updated to run from project root
+- ✅ Local Makefile commands consistent with CI workflow
+- ✅ All path references work correctly in both environments
+
+The GitHub Actions failures should now be completely resolved.
