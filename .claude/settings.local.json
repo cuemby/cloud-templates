@@ -23,7 +23,12 @@
       "WebFetch(domain:download.fedoraproject.org)",
       "WebFetch(domain:mirror.cs.siue.edu)",
       "Bash(deno cache:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh workflow list:*)",
+      "Bash(gh workflow view:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)"
     ],
     "deny": []
   }
