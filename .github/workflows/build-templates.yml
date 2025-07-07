@@ -73,6 +73,10 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y qemu-system-x86 qemu-utils
     
+    - name: Initialize Packer plugins
+      run: |
+        packer init templates/${{ matrix.template }}.pkr.hcl
+    
     - name: Validate Packer template
       run: |
         packer validate templates/${{ matrix.template }}.pkr.hcl
