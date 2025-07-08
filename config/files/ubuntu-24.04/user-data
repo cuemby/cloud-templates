@@ -16,7 +16,7 @@ autoinstall:
   identity:
     hostname: ubuntu2404
     username: ubuntu
-    password: "$6$pLPVIGqqsVc4NZJ3$qQiPaNR.jFFFQ.UYkQNeHPH9ktWDWanDh2QjNqtG1T4htiklT0WSATVK8uw6yZvYgetVxDFI/5INdqmuVRcw41"
+    password: "$6$j5S85NAKwgQqlG76$isakpSubUTOCGfN5Wc1tOeyPJCaaTJUEpzlkAdSMp.JaDx6RugsQ./H7y.XjGcIyM1If3dfrhMyvlYv456ljq."
   ssh:
     allow-pw: true
     install-server: true
@@ -24,9 +24,15 @@ autoinstall:
     disable_root: false
   late-commands:
     - 'echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /target/etc/sudoers.d/ubuntu'
+    - 'chmod 440 /target/etc/sudoers.d/ubuntu'
+    - 'echo "ubuntu:ubuntu" | chroot /target chpasswd'
+    - 'echo "root:ubuntu" | chroot /target chpasswd'
     - 'sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/g" /target/etc/ssh/sshd_config'
     - 'sed -i "s/#PasswordAuthentication yes/PasswordAuthentication yes/g" /target/etc/ssh/sshd_config'
     - 'sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/g" /target/etc/ssh/sshd_config'
-    - 'echo "root:ubuntu" | chroot /target chpasswd'
+    - 'sed -i "s/#PubkeyAuthentication yes/PubkeyAuthentication yes/g" /target/etc/ssh/sshd_config'
+    - 'echo "ChallengeResponseAuthentication no" >> /target/etc/ssh/sshd_config'
+    - 'echo "UsePAM yes" >> /target/etc/ssh/sshd_config'
     - 'chroot /target systemctl enable ssh'
+    - 'chroot /target systemctl enable sshd'
     - 'echo i6300esb >> /target/etc/modules'
