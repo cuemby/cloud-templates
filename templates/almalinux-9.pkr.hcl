@@ -32,11 +32,11 @@ source "qemu" "almalinux-9" {
   iso_checksum         = var.iso_checksum
   vm_name              = var.name
   format               = "qcow2"
-  accelerator          = "kvm"
+  accelerator = "tcg"
   headless             = true
   cpus                 = 2
   qemuargs = [
-    ["-cpu", "host,+nx"],
+    ["-cpu", "qemu64,+nx"],
   ]
   memory               = 2048
   disk_size            = "8G"

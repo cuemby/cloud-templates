@@ -27,7 +27,7 @@ source "qemu" "ubuntu-20-04" {
   iso_checksum         = var.iso_checksum
   vm_name              = var.name
   format               = "qcow2"
-  accelerator          = "kvm"
+  accelerator = "tcg"
   headless             = true
   cpus                 = 2
   memory               = 2048

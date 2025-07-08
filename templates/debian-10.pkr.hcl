@@ -32,7 +32,7 @@ source "qemu" "debian-10" {
   iso_checksum         = var.iso_checksum
   vm_name              = var.name
   format               = "qcow2"
-  accelerator          = "kvm"
+  accelerator = "tcg"
   headless             = true
   cpus                 = 2
   memory               = 2048
