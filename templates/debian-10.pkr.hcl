@@ -42,11 +42,11 @@ source "qemu" "debian-10" {
   disk_compression     = true
   boot_command         = var.boot_command
   communicator         = "ssh"
-  vnc_bind_address     = "[::]"
+  vnc_bind_address     = "0.0.0.0"
   ssh_wait_timeout     = "30m"
   ssh_username         = "root"
   ssh_password         = "PVT6HXW4t7PDy7Pb"
-  http_directory       = "files"
+  http_directory       = "config/files"
   http_port_min        = 8000
   http_port_max        = 8100
   output_directory     = "build_${var.name}"
