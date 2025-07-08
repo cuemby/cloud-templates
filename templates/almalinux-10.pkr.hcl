@@ -27,12 +27,18 @@ variable "boot_command" {
   default = ["<esc><wait><esc><wait>e<down><down><end> inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/kickstart/almalinux-10.ks<wait><f10>"]
 }
 
+variable "accelerator" {
+  type    = string
+  default = "kvm"
+  description = "QEMU accelerator (kvm for local, tcg for CI)"
+}
+
 source "qemu" "almalinux-10" {
   iso_url              = var.url
   iso_checksum         = var.iso_checksum
   vm_name              = var.name
   format               = "qcow2"
-  accelerator = "tcg"
+  accelerator = var.accelerator
   headless             = true
   cpus                 = 2
   qemuargs = [

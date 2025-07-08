@@ -27,12 +27,18 @@ variable "boot_command" {
   default = ["<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/kickstart/centos-7.ks<enter><wait>"]
 }
 
+variable "accelerator" {
+  type    = string
+  default = "kvm"
+  description = "QEMU accelerator (kvm for local, tcg for CI)"
+}
+
 source "qemu" "centos-7" {
   iso_url              = var.url
   iso_checksum         = var.iso_checksum
   vm_name              = var.name
   format               = "qcow2"
-  accelerator = "tcg"
+  accelerator = var.accelerator
   headless             = true
   cpus                 = 2
   memory               = 2048

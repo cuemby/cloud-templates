@@ -22,12 +22,18 @@ variable "iso_checksum" {
   default = "sha256:b8f31413336b9393ad5d8ef0282717b2ab19f007df2e9ed5196c13d8f9153c8b"
 }
 
+variable "accelerator" {
+  type    = string
+  default = "kvm"
+  description = "QEMU accelerator (kvm for local, tcg for CI)"
+}
+
 source "qemu" "ubuntu-20-04" {
   iso_url              = var.url
   iso_checksum         = var.iso_checksum
   vm_name              = var.name
   format               = "qcow2"
-  accelerator = "tcg"
+  accelerator = var.accelerator
   headless             = true
   cpus                 = 2
   memory               = 2048

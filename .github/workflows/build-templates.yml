@@ -88,7 +88,10 @@ jobs:
     
     - name: Build template
       run: |
-        PACKER_LOG=1 timeout 240m packer build -var "name=${{ matrix.template }}" templates/${{ matrix.template }}.pkr.hcl
+        PACKER_LOG=1 timeout 240m packer build \
+          -var "name=${{ matrix.template }}" \
+          -var "accelerator=tcg" \
+          templates/${{ matrix.template }}.pkr.hcl
     
     - name: Generate metadata
       run: |
