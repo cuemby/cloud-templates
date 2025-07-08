@@ -47,6 +47,19 @@ async function getOfficialChecksum(url: string): Promise<string | null> {
       }
     }
     
+    // AlmaLinux and CloudLinux checksum files
+    if (url.includes("repo.almalinux.org") || url.includes("repo.cloudlinux.com")) {
+      const basePath = url.substring(0, url.lastIndexOf("/"));
+      const checksumUrl = `${basePath}/CHECKSUM`;
+      const response = await fetch(checksumUrl);
+      if (response.ok) {
+        const checksumData = await response.text();
+        // Format: SHA256 (filename) = checksum
+        const match = checksumData.match(new RegExp(`SHA256\\s+\\(${filename}\\)\\s+=\\s+([a-f0-9]{64})`));
+        return match ? match[1] : null;
+      }
+    }
+    
     // Add more sources as needed for other distributions
     return null;
   } catch (error) {

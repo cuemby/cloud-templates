@@ -14,12 +14,12 @@ variable "name" {
 
 variable "url" {
   type    = string
-  default = "https://downloads.cloudlinux.com/cloudlinux/8/isos/x86_64/CloudLinux-8.10-x86_64-boot.iso"
+  default = "https://repo.cloudlinux.com/cloudlinux/8/iso/x86_64/CloudLinux-8.10-x86_64-boot.iso"
 }
 
 variable "iso_checksum" {
   type    = string
-  default = "sha256:e5edac718bc5665dafaa0b577a601868e2bf00bf8ca5d71be68b220d57ddab0d"
+  default = "sha256:3da9c56f5eb0d80670b95db55998ac55d4ea840d05ed56f8b72179a0f31119b8"
 }
 
 variable "boot_command" {
