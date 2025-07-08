@@ -29,27 +29,32 @@ jobs:
     - name: Detect changed templates
       id: changes
       run: |
-        if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.template_name }}" ]; then
-          echo "templates=[\"${{ github.event.inputs.template_name }}\"]" >> $GITHUB_OUTPUT
-          echo "has_changes=true" >> $GITHUB_OUTPUT
-        elif [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
-          # Build all templates on main branch push
-          templates=$(find templates -name "*.pkr.hcl" -exec basename {} .pkr.hcl \; | sort | jq -R . | jq -s . | jq -c .)
-          echo "templates=${templates}" >> $GITHUB_OUTPUT
-          echo "has_changes=true" >> $GITHUB_OUTPUT
-        else
-          # For PRs, only build changed templates
-          changed_files=$(git diff --name-only HEAD~1 HEAD | grep -E "(templates/|scripts/|config/)" | head -20)
-          if [ -n "$changed_files" ]; then
-            # Extract template names from changed files
-            templates=$(echo "$changed_files" | grep "templates/" | sed 's|templates/||' | sed 's|\.pkr\.hcl||' | sort -u | jq -R . | jq -s . | jq -c .)
-            echo "templates=${templates}" >> $GITHUB_OUTPUT
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-          else
-            echo "templates=[]" >> $GITHUB_OUTPUT
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-          fi
-        fi
+        # TEMPORARY: Only build ubuntu-24.04 for debugging
+        echo "templates=[\"ubuntu-24.04\"]" >> $GITHUB_OUTPUT
+        echo "has_changes=true" >> $GITHUB_OUTPUT
+        
+        # COMMENTED OUT: Original logic for all templates
+        # if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.template_name }}" ]; then
+        #   echo "templates=[\"${{ github.event.inputs.template_name }}\"]" >> $GITHUB_OUTPUT
+        #   echo "has_changes=true" >> $GITHUB_OUTPUT
+        # elif [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
+        #   # Build all templates on main branch push
+        #   templates=$(find templates -name "*.pkr.hcl" -exec basename {} .pkr.hcl \; | sort | jq -R . | jq -s . | jq -c .)
+        #   echo "templates=${templates}" >> $GITHUB_OUTPUT
+        #   echo "has_changes=true" >> $GITHUB_OUTPUT
+        # else
+        #   # For PRs, only build changed templates
+        #   changed_files=$(git diff --name-only HEAD~1 HEAD | grep -E "(templates/|scripts/|config/)" | head -20)
+        #   if [ -n "$changed_files" ]; then
+        #     # Extract template names from changed files
+        #     templates=$(echo "$changed_files" | grep "templates/" | sed 's|templates/||' | sed 's|\.pkr\.hcl||' | sort -u | jq -R . | jq -s . | jq -c .)
+        #     echo "templates=${templates}" >> $GITHUB_OUTPUT
+        #     echo "has_changes=true" >> $GITHUB_OUTPUT
+        #   else
+        #     echo "templates=[]" >> $GITHUB_OUTPUT
+        #     echo "has_changes=false" >> $GITHUB_OUTPUT
+        #   fi
+        # fi
 
   build:
     needs: detect-changes

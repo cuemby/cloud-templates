@@ -45,7 +45,6 @@ source "qemu" "almalinux-9" {
   disk_compression     = true
   boot_command         = var.boot_command
   communicator         = "ssh"
-  vnc_bind_address     = "0.0.0.0"
   ssh_wait_timeout     = "30m"
   ssh_username         = "root"
   ssh_password         = "RvHtrfTwCjTnhHrD"

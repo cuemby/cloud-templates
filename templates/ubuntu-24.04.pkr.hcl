@@ -58,7 +58,6 @@ source "qemu" "ubuntu-24-04" {
     "<enter><f10><wait>",
   ]
   communicator         = "ssh"
-  vnc_bind_address     = "0.0.0.0"
   ssh_wait_timeout     = "30m"
   ssh_username         = "root"
   ssh_password         = "58p5wMfpyTQhqa4Q"
