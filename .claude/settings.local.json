@@ -64,7 +64,9 @@
       "Bash(curl:*)",
       "Bash(pkill:*)",
       "Bash(sed:*)",
-      "Bash(git remote set-url:*)"
+      "Bash(git remote set-url:*)",
+      "Bash(python3:*)",
+      "Bash(openssl passwd:*)"
     ],
     "deny": []
   }
