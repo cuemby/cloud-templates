@@ -22,9 +22,11 @@ autoinstall:
     install-server: true
   user-data:
     disable_root: false
-    runcmd:
-        - 'echo "root:58p5wMfpyTQhqa4Q"|chpasswd'
   late-commands:
     - 'echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /target/etc/sudoers.d/ubuntu'
     - 'sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/g" /target/etc/ssh/sshd_config'
+    - 'sed -i "s/#PasswordAuthentication yes/PasswordAuthentication yes/g" /target/etc/ssh/sshd_config'
+    - 'sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/g" /target/etc/ssh/sshd_config'
+    - 'echo "root:58p5wMfpyTQhqa4Q" | chroot /target chpasswd'
+    - 'chroot /target systemctl enable ssh'
     - 'echo i6300esb >> /target/etc/modules'

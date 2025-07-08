@@ -63,7 +63,8 @@
       "Bash(\"scripts/ubuntu-24.04/remove-swap.sh\" )",
       "Bash(curl:*)",
       "Bash(pkill:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(git remote set-url:*)"
     ],
     "deny": []
   }

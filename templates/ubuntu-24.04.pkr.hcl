@@ -41,33 +41,19 @@ source "qemu" "ubuntu-24-04" {
   disk_interface       = "virtio-scsi"
   disk_discard         = "unmap"
   disk_compression     = true
-  boot_wait            = "2s"
+  boot_wait            = "5s"
   boot_command = [
-    "<esc><esc><esc><esc>e<wait>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del><del>",
-    "linux /casper/vmlinuz autoinstall ds=\"nocloud-net;seedfrom=http://{{ .HTTPIP }}:{{ .HTTPPort }}/\" ---<enter><wait>",
+    "c<wait>",
+    "linux /casper/vmlinuz autoinstall ds=nocloud-net\\;seedfrom=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ ---<enter><wait>",
     "initrd /casper/initrd<enter><wait>",
-    "boot<enter>",
-    "<enter><f10><wait>",
+    "boot<enter><wait>",
   ]
   communicator         = "ssh"
-  ssh_wait_timeout     = "30m"
+  ssh_wait_timeout     = "45m"
   ssh_username         = "root"
   ssh_password         = "58p5wMfpyTQhqa4Q"
-  ssh_handshake_attempts = "200"
+  ssh_handshake_attempts = "300"
+  pause_before_connecting = "3m"
   http_directory       = "config/files/ubuntu-24.04"
   http_port_min        = 8000
   http_port_max        = 8100
