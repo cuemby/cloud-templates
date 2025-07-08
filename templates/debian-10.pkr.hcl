@@ -14,12 +14,12 @@ variable "name" {
 
 variable "url" {
   type    = string
-  default = "https://cdimage.debian.org/debian-cd/10.13.0/amd64/iso-cd/debian-10.13.0-amd64-netinst.iso"
+  default = "https://cdimage.debian.org/cdimage/archive/10.13.0/amd64/iso-cd/debian-10.13.0-amd64-netinst.iso"
 }
 
 variable "iso_checksum" {
   type    = string
-  default = "sha256:b317d87b0a3d5b568f48a92dcabfc4bc51fe58d9f67ca13b013f1b8329d1306d"
+  default = "sha256:75aa64071060402a594dcf1e14afd669ca0f8bf757b56d4c9c1a31b8f7c8f931"
 }
 
 variable "boot_command" {

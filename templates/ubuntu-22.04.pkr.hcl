@@ -19,7 +19,7 @@ variable "url" {
 
 variable "iso_checksum" {
   type    = string
-  default = "sha256:84aeaf7823c8c61baa0ae862d0a06b03409394800000b3235854a6b38eb4856f"
+  default = "sha256:9bc6028870aef3f74f4e16b900008179e78b130e6b0b9a140635434a46aa98b0"
 }
 
 source "qemu" "ubuntu-22-04" {

@@ -60,7 +60,9 @@
       "Bash(\"config/files/ubuntu-24.04/01-netcfg.yaml\" )",
       "Bash(\"config/files/generic/99-disable-ipv6-tempaddr.conf\" )",
       "Bash(\"config/files/generic/99-hotPlugCPU.rules\" )",
-      "Bash(\"scripts/ubuntu-24.04/remove-swap.sh\" )"
+      "Bash(\"scripts/ubuntu-24.04/remove-swap.sh\" )",
+      "Bash(curl:*)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }

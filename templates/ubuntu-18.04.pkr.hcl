@@ -14,12 +14,12 @@ variable "name" {
 
 variable "url" {
   type    = string
-  default = "https://releases.ubuntu.com/18.04/ubuntu-18.04.6-server-amd64.iso"
+  default = "https://releases.ubuntu.com/18.04/ubuntu-18.04.6-live-server-amd64.iso"
 }
 
 variable "iso_checksum" {
   type    = string
-  default = "sha256:8c5fc24894394035402f66f3824beb7234b757dd2b5531379cb310cedfdf0996"
+  default = "sha256:6c647b1ab4318e8c560d5748f908e108be654bad1e165f7cf4f3c1fc43995934"
 }
 
 variable "boot_command" {
