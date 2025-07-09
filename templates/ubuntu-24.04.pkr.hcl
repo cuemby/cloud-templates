@@ -50,7 +50,7 @@ source "qemu" "ubuntu-24-04" {
   ]
   communicator         = "ssh"
   ssh_wait_timeout     = "45m"
-  ssh_username         = "ubuntu"
+  ssh_username         = "root"
   ssh_password         = "ubuntu"
   ssh_handshake_attempts = "300"
   pause_before_connecting = "3m"
