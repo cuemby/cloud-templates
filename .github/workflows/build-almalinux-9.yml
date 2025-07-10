@@ -1,0 +1,67 @@
+name: Build AlmaLinux 9 Templates
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'cloud/almalinux/x86_64/**'
+      - 'scripts/**'
+      - '.github/workflows/build-almalinux-9.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'cloud/almalinux/x86_64/**'
+      - 'scripts/**'
+      - '.github/workflows/build-almalinux-9.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        variant: [efi, bios]
+        include:
+          - variant: efi
+            pkvars_file: almalinux-9-efi-x86_64.pkvars.hcl
+            vm_name: almalinux-9-efi-x86_64
+          - variant: bios
+            pkvars_file: almalinux-9-bios-x86_64.pkvars.hcl
+            vm_name: almalinux-9-bios-x86_64
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@main
+        with:
+          version: latest
+      
+      - name: Install QEMU and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 qemu-utils genisoimage ovmf
+      
+      - name: Initialize Packer
+        run: |
+          cd cloud/almalinux/x86_64
+          packer init .
+      
+      - name: Validate Packer template
+        run: |
+          cd cloud/almalinux/x86_64
+          packer validate -var-file=${{ matrix.pkvars_file }} almalinux-9-x86_64.pkr.hcl
+      
+      - name: Build template (${{ matrix.variant }})
+        run: |
+          cd cloud/almalinux/x86_64
+          packer build -var-file=${{ matrix.pkvars_file }} almalinux-9-x86_64.pkr.hcl
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: almalinux-9-${{ matrix.variant }}-x86_64
+          path: |
+            cloud/almalinux/x86_64/output-${{ matrix.vm_name }}/*
+          retention-days: 30
