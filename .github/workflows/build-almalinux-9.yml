@@ -74,10 +74,20 @@ jobs:
       - name: Build template (${{ matrix.variant }})
         run: |
           cd cloud/almalinux/x86_64
-          # Use multiple CPU cores for faster builds
+          # Use appropriate resources for GitHub Actions environment
           export PACKER_LOG=1
           export PACKER_LOG_PATH="/tmp/packer.log"
-          packer build -var="cpus=4" -var="memory=4096" -var-file=${{ matrix.pkvars_file }} almalinux-9-x86_64.pkr.hcl
+          # GitHub Actions runners have 2 CPU cores and 7GB RAM
+          # Use conservative settings to avoid resource exhaustion
+          # Increase timeouts for CI environment and optimize for faster builds
+          timeout 75m packer build \
+            -var="cpus=2" \
+            -var="memory=2048" \
+            -var="ssh_timeout=900s" \
+            -var="headless=true" \
+            -on-error=cleanup \
+            -var-file=${{ matrix.pkvars_file }} \
+            almalinux-9-x86_64.pkr.hcl
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
