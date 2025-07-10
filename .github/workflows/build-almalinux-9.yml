@@ -14,6 +14,17 @@ on:
       - 'scripts/**'
       - '.github/workflows/build-almalinux-9.yml'
   workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a release after successful build'
+        required: false
+        default: 'false'
+        type: boolean
+      release_tag:
+        description: 'Release tag (leave empty for auto-generated)'
+        required: false
+        default: ''
+        type: string
 
 jobs:
   build:
@@ -105,3 +116,82 @@ jobs:
           name: packer-logs-${{ matrix.variant }}
           path: /tmp/packer.log
           retention-days: 7
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ (github.ref == 'refs/heads/main' && github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && inputs.create_release == 'true') }}
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+      
+      - name: Generate release tag
+        id: tag
+        run: |
+          if [ -n "${{ inputs.release_tag }}" ]; then
+            echo "tag=${{ inputs.release_tag }}" >> $GITHUB_OUTPUT
+          else
+            # Generate tag based on date and commit
+            TAG="almalinux-9-$(date +'%Y%m%d')-$(git rev-parse --short HEAD)"
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          release_name: AlmaLinux 9 Templates - ${{ steps.tag.outputs.tag }}
+          body: |
+            # AlmaLinux 9 Cloud Templates
+            
+            This release contains AlmaLinux 9 cloud templates built for both EFI and BIOS boot modes.
+            
+            ## Templates Included
+            - **AlmaLinux 9 EFI x86_64**: `almalinux-9-efi-x86_64.qcow2`
+            - **AlmaLinux 9 BIOS x86_64**: `almalinux-9-bios-x86_64.qcow2`
+            
+            ## Build Information
+            - Built from commit: ${{ github.sha }}
+            - Build date: $(date +'%Y-%m-%d %H:%M:%S UTC')
+            - Source: [GitHub Repository](https://github.com/${{ github.repository }})
+            
+            ## Usage
+            These templates are ready to use with CloudStack, OpenStack, or any QEMU/KVM-based virtualization platform.
+          draft: false
+          prerelease: false
+      
+      - name: List artifact structure
+        run: |
+          echo "Artifact structure:"
+          find ./artifacts -type f -name "*.qcow2" | head -10
+      
+      - name: Upload EFI template to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/almalinux-9-efi-x86_64/output-almalinux-9-efi-x86_64/almalinux-9-efi-x86_64.qcow2
+          asset_name: almalinux-9-efi-x86_64.qcow2
+          asset_content_type: application/octet-stream
+      
+      - name: Upload BIOS template to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/almalinux-9-bios-x86_64/output-almalinux-9-bios-x86_64/almalinux-9-bios-x86_64.qcow2
+          asset_name: almalinux-9-bios-x86_64.qcow2
+          asset_content_type: application/octet-stream
