@@ -132,4 +132,20 @@ build {
       "../../../scripts/cloud-init-wait.sh",
     ]
   }
+
+  # Copy CloudStack-specific cloud-init configuration
+  provisioner "file" {
+    source      = "../../../files/generic/cloud-init.cfg"
+    destination = "/tmp/cloud-init.cfg"
+  }
+
+  # Install the cloud-init configuration
+  provisioner "shell" {
+    execute_command = "echo '${var.ssh_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
+    inline = [
+      "sudo cp /tmp/cloud-init.cfg /etc/cloud/cloud.cfg",
+      "sudo chown root:root /etc/cloud/cloud.cfg",
+      "sudo chmod 644 /etc/cloud/cloud.cfg"
+    ]
+  }
 }
