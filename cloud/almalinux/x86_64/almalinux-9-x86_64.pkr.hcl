@@ -148,4 +148,59 @@ build {
       "sudo chmod 644 /etc/cloud/cloud.cfg"
     ]
   }
+
+  # Copy generic configuration files
+  provisioner "file" {
+    source      = "../../../files/generic/99-disable-ipv6-tempadrr.conf"
+    destination = "/tmp/99-disable-ipv6-tempadrr.conf"
+  }
+
+  provisioner "file" {
+    source      = "../../../files/generic/99-hostPlugCPU.rules"
+    destination = "/tmp/99-hostPlugCPU.rules"
+  }
+
+  provisioner "file" {
+    source      = "../../../files/generic/watchdog.conf"
+    destination = "/tmp/watchdog.conf"
+  }
+
+  # Copy CentOS-specific configuration files
+  provisioner "file" {
+    source      = "../../../files/centos/90-dhcp-client.conf"
+    destination = "/tmp/90-dhcp-client.conf"
+  }
+
+  provisioner "file" {
+    source      = "../../../files/centos/90-dns-none.conf"
+    destination = "/tmp/90-dns-none.conf"
+  }
+
+  provisioner "file" {
+    source      = "../../../files/centos/grub"
+    destination = "/tmp/grub"
+  }
+
+  # Install configuration files to their correct locations
+  provisioner "shell" {
+    execute_command = "echo '${var.ssh_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
+    inline = [
+      "sudo cp /tmp/99-disable-ipv6-tempadrr.conf /etc/sysctl.d/99-disable-ipv6-tempadrr.conf",
+      "sudo cp /tmp/99-hostPlugCPU.rules /etc/udev/rules.d/99-hostPlugCPU.rules",
+      "sudo cp /tmp/watchdog.conf /etc/watchdog.conf",
+      "sudo cp /tmp/90-dhcp-client.conf /etc/NetworkManager/conf.d/90-dhcp-client.conf",
+      "sudo cp /tmp/90-dns-none.conf /etc/NetworkManager/conf.d/90-dns-none.conf",
+      "sudo cp /tmp/grub /etc/default/grub",
+      "sudo chown root:root /etc/sysctl.d/99-disable-ipv6-tempadrr.conf /etc/udev/rules.d/99-hostPlugCPU.rules /etc/watchdog.conf /etc/NetworkManager/conf.d/90-dhcp-client.conf /etc/NetworkManager/conf.d/90-dns-none.conf /etc/default/grub",
+      "sudo chmod 644 /etc/sysctl.d/99-disable-ipv6-tempadrr.conf /etc/udev/rules.d/99-hostPlugCPU.rules /etc/watchdog.conf /etc/NetworkManager/conf.d/90-dhcp-client.conf /etc/NetworkManager/conf.d/90-dns-none.conf /etc/default/grub"
+    ]
+  }
+
+  # Execute AlmaLinux post-installation script
+  provisioner "shell" {
+    execute_command = "echo '${var.ssh_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
+    scripts = [
+      "../../../scripts/almalinux/almalinux-9-post.sh"
+    ]
+  }
 }
