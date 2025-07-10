@@ -129,7 +129,7 @@ build {
   provisioner "shell" {
     execute_command = "echo '${var.ssh_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
     scripts = [
-      "../scripts/cloud-init-wait.sh",
+      "../../../scripts/cloud-init-wait.sh",
     ]
   }
 }
