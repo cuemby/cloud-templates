@@ -18,7 +18,7 @@ on:
       create_release:
         description: 'Create a release after successful build'
         required: false
-        default: 'false'
+        default: false
         type: boolean
       release_tag:
         description: 'Release tag (leave empty for auto-generated)'
@@ -182,7 +182,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/almalinux-9-efi-x86_64/output-almalinux-9-efi-x86_64/almalinux-9-efi-x86_64.qcow2
+          asset_path: ./artifacts/almalinux-9-efi-x86_64/almalinux-9-efi-x86_64.qcow2
           asset_name: almalinux-9-efi-x86_64.qcow2
           asset_content_type: application/octet-stream
       
@@ -192,6 +192,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/almalinux-9-bios-x86_64/output-almalinux-9-bios-x86_64/almalinux-9-bios-x86_64.qcow2
+          asset_path: ./artifacts/almalinux-9-bios-x86_64/almalinux-9-bios-x86_64.qcow2
           asset_name: almalinux-9-bios-x86_64.qcow2
           asset_content_type: application/octet-stream
