@@ -113,8 +113,12 @@ source "qemu" "almalinux" {
   iso_checksum     = var.iso_checksum
   iso_url          = var.iso_url
   machine_type     = "q35"
+  vnc_bind_address = "127.0.0.1"
   qemuargs = [
-    ["-cdrom", "boot-${var.vm_name}/cidata.iso"]
+    ["-cdrom", "boot-${var.vm_name}/cidata.iso"],
+    ["-display", "none"],
+    ["-vga", "none"],
+    ["-nographic"]
   ]
   output_directory  = "output-${var.vm_name}"
   shutdown_command  = "echo '${local.build_password}' | sudo -S shutdown -P now"
