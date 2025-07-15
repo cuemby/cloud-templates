@@ -46,7 +46,8 @@ variable "ssh_username" {
 
 variable "ssh_password" {
   type    = string
-  default = "packer"
+  default = ""
+  description = "SSH password for the build user. If empty, a random password will be generated."
 }
 
 variable "ssh_timeout" {
@@ -59,11 +60,16 @@ variable "vm_name" {
   default = "almalinux-9-x86_64"
 }
 
+locals {
+  # Generate a random password if not provided - using UUID without hyphens
+  build_password = var.ssh_password != "" ? var.ssh_password : replace(uuidv4(), "-", "")
+}
+
 source "file" "user_data" {
   content = <<EOF
 #cloud-config
 user: ${var.ssh_username}
-password: ${var.ssh_password}
+password: ${local.build_password}
 chpasswd: { expire: False }
 ssh_pwauth: True
 EOF
@@ -111,8 +117,8 @@ source "qemu" "almalinux" {
     ["-cdrom", "boot-${var.vm_name}/cidata.iso"]
   ]
   output_directory  = "output-${var.vm_name}"
-  shutdown_command  = "echo '${var.ssh_password}' | sudo -S shutdown -P now"
-  ssh_password      = var.ssh_password
+  shutdown_command  = "echo '${local.build_password}' | sudo -S shutdown -P now"
+  ssh_password      = local.build_password
   ssh_timeout       = var.ssh_timeout
   ssh_username      = var.ssh_username
   vm_name           = "${var.vm_name}.qcow2"
@@ -124,10 +130,15 @@ source "qemu" "almalinux" {
 build {
   sources = ["source.qemu.almalinux"]
 
+  # Show the generated build password for debugging
+  provisioner "shell-local" {
+    inline = ["echo '=== Generated build password: ${local.build_password} ==='"]
+  }
+
   # cloud-init may still be running when we start executing scripts
   # To avoid race conditions, make sure cloud-init is done first
   provisioner "shell" {
-    execute_command = "echo '${var.ssh_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
+    execute_command = "echo '${local.build_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
     scripts = [
       "../../../scripts/cloud-init-wait.sh",
     ]
@@ -141,11 +152,28 @@ build {
 
   # Install the cloud-init configuration
   provisioner "shell" {
-    execute_command = "echo '${var.ssh_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
+    execute_command = "echo '${local.build_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
     inline = [
       "sudo cp /tmp/cloud-init.cfg /etc/cloud/cloud.cfg",
       "sudo chown root:root /etc/cloud/cloud.cfg",
       "sudo chmod 644 /etc/cloud/cloud.cfg"
+    ]
+  }
+
+  # Copy CloudStack user configuration  
+  provisioner "file" {
+    source      = "../../../files/generic/80_cloudstack_user.cfg"
+    destination = "/tmp/80_cloudstack_user.cfg"
+  }
+
+  # Install CloudStack user configuration
+  provisioner "shell" {
+    execute_command = "echo '${local.build_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
+    inline = [
+      "sudo mkdir -p /etc/cloud/cloud.cfg.d",
+      "sudo cp /tmp/80_cloudstack_user.cfg /etc/cloud/cloud.cfg.d/80_cloudstack_user.cfg",
+      "sudo chown root:root /etc/cloud/cloud.cfg.d/80_cloudstack_user.cfg",
+      "sudo chmod 644 /etc/cloud/cloud.cfg.d/80_cloudstack_user.cfg"
     ]
   }
 
@@ -183,7 +211,7 @@ build {
 
   # Install configuration files to their correct locations
   provisioner "shell" {
-    execute_command = "echo '${var.ssh_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
+    execute_command = "echo '${local.build_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
     inline = [
       "sudo cp /tmp/99-disable-ipv6-tempadrr.conf /etc/sysctl.d/99-disable-ipv6-tempadrr.conf",
       "sudo cp /tmp/99-hostPlugCPU.rules /etc/udev/rules.d/99-hostPlugCPU.rules",
@@ -198,7 +226,7 @@ build {
 
   # Execute AlmaLinux post-installation script
   provisioner "shell" {
-    execute_command = "echo '${var.ssh_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
+    execute_command = "echo '${local.build_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
     scripts = [
       "../../../scripts/almalinux/almalinux-9-post.sh"
     ]
