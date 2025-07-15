@@ -29,11 +29,18 @@ echo "Cleaning up cloud-init"
 find /var/log -type f -name 'cloud-init*.log' -print -delete
 cloud-init clean -s -l
 
-echo "Delete root password and lock account"
+echo "Configure SSH for CloudStack password management"
+# Delete root password but don't lock the account (CloudStack will manage it)
 passwd --delete root
-passwd --lock root
+# Create cloud-user if it doesn't exist
+if ! id -u cloud-user >/dev/null 2>&1; then
+    useradd -m -s /bin/bash -G wheel,adm,systemd-journal cloud-user
+fi
+# Delete cloud-user password (CloudStack will manage it)
+passwd --delete cloud-user
+# Configure SSH to allow password authentication for CloudStack
 sed -i 's|^ *PermitRootLogin .*|PermitRootLogin yes|g' /etc/ssh/sshd_config
-sed -i 's|^ *PasswordAuthentication .*|PasswordAuthentication no|g' /etc/ssh/sshd_config
+sed -i 's|^ *PasswordAuthentication .*|PasswordAuthentication yes|g' /etc/ssh/sshd_config
 
 echo "Deleting existing ssh host keys"
 rm -f /etc/ssh/ssh_host*
