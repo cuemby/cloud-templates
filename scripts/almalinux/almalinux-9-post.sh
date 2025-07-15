@@ -38,9 +38,28 @@ if ! id -u cloud-user >/dev/null 2>&1; then
 fi
 # Delete cloud-user password (CloudStack will manage it)
 passwd --delete cloud-user
-# Configure SSH to allow password authentication for CloudStack
-sed -i 's|^ *PermitRootLogin .*|PermitRootLogin yes|g' /etc/ssh/sshd_config
-sed -i 's|^ *PasswordAuthentication .*|PasswordAuthentication yes|g' /etc/ssh/sshd_config
+
+# Remove any authorized keys that might allow passwordless login
+echo "Removing all SSH authorized keys to prevent passwordless login"
+rm -rf /root/.ssh
+rm -rf /home/packer/.ssh
+rm -rf /home/cloud-user/.ssh
+# Also remove the packer user since it's only for build
+userdel -r packer || true
+
+# Configure SSH to allow both password and key authentication for CloudStack
+echo "Configuring SSH settings"
+# First uncomment the lines, then set the values
+sed -i 's|^#*PermitRootLogin .*|PermitRootLogin yes|g' /etc/ssh/sshd_config
+sed -i 's|^#*PasswordAuthentication .*|PasswordAuthentication yes|g' /etc/ssh/sshd_config
+sed -i 's|^#*PubkeyAuthentication .*|PubkeyAuthentication yes|g' /etc/ssh/sshd_config
+sed -i 's|^#*ChallengeResponseAuthentication .*|ChallengeResponseAuthentication no|g' /etc/ssh/sshd_config
+
+# If the settings don't exist, add them
+grep -q "^PermitRootLogin" /etc/ssh/sshd_config || echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+grep -q "^PasswordAuthentication" /etc/ssh/sshd_config || echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+grep -q "^PubkeyAuthentication" /etc/ssh/sshd_config || echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
+grep -q "^ChallengeResponseAuthentication" /etc/ssh/sshd_config || echo "ChallengeResponseAuthentication no" >> /etc/ssh/sshd_config
 
 echo "Deleting existing ssh host keys"
 rm -f /etc/ssh/ssh_host*
