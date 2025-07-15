@@ -29,15 +29,17 @@ echo "Cleaning up cloud-init"
 find /var/log -type f -name 'cloud-init*.log' -print -delete
 cloud-init clean -s -l
 
-echo "Configure SSH for CloudStack password management"
-# Delete root password but don't lock the account (CloudStack will manage it)
+echo "Configure users for CloudStack password management"
+# Unlock root account and clear password (CloudStack will set it)
 passwd --delete root
+passwd --unlock root || true
 # Create cloud-user if it doesn't exist
 if ! id -u cloud-user >/dev/null 2>&1; then
     useradd -m -s /bin/bash -G wheel,adm,systemd-journal cloud-user
 fi
-# Delete cloud-user password (CloudStack will manage it)
+# Clear cloud-user password and unlock (CloudStack will set it)
 passwd --delete cloud-user
+passwd --unlock cloud-user || true
 
 # Remove any authorized keys that might allow passwordless login
 echo "Removing all SSH authorized keys to prevent passwordless login"
@@ -60,6 +62,10 @@ grep -q "^PermitRootLogin" /etc/ssh/sshd_config || echo "PermitRootLogin yes" >>
 grep -q "^PasswordAuthentication" /etc/ssh/sshd_config || echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
 grep -q "^PubkeyAuthentication" /etc/ssh/sshd_config || echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
 grep -q "^ChallengeResponseAuthentication" /etc/ssh/sshd_config || echo "ChallengeResponseAuthentication no" >> /etc/ssh/sshd_config
+
+# Validate SSH configuration
+echo "Validating SSH configuration"
+sshd -t && echo "SSH configuration is valid" || echo "SSH configuration has errors"
 
 echo "Deleting existing ssh host keys"
 rm -f /etc/ssh/ssh_host*
