@@ -30,15 +30,15 @@ find /var/log -type f -name 'cloud-init*.log' -print -delete
 cloud-init clean -s -l
 
 echo "Configure users for CloudStack password management"
-# Unlock root account and clear password (CloudStack will set it)
-passwd --delete root
+# Set temporary password for root (CloudStack will override it)
+echo 'root:temp-cloudstack-will-change' | chpasswd
 passwd --unlock root || true
 # Create cloud-user if it doesn't exist
 if ! id -u cloud-user >/dev/null 2>&1; then
     useradd -m -s /bin/bash -G wheel,adm,systemd-journal cloud-user
 fi
-# Clear cloud-user password and unlock (CloudStack will set it)
-passwd --delete cloud-user
+# Set temporary password for cloud-user (CloudStack will override it)
+echo 'cloud-user:temp-cloudstack-will-change' | chpasswd
 passwd --unlock cloud-user || true
 
 # Remove any authorized keys that might allow passwordless login
@@ -66,6 +66,17 @@ grep -q "^ChallengeResponseAuthentication" /etc/ssh/sshd_config || echo "Challen
 # Validate SSH configuration
 echo "Validating SSH configuration"
 sshd -t && echo "SSH configuration is valid" || echo "SSH configuration has errors"
+
+# Show current user status for debugging
+echo "User account status after configuration:"
+passwd -S root || true
+passwd -S cloud-user || true
+
+# Show SSH configuration for debugging
+echo "SSH Password Authentication setting:"
+grep "^PasswordAuthentication" /etc/ssh/sshd_config || echo "PasswordAuthentication setting not found"
+echo "SSH PermitRootLogin setting:"
+grep "^PermitRootLogin" /etc/ssh/sshd_config || echo "PermitRootLogin setting not found"
 
 echo "Deleting existing ssh host keys"
 rm -f /etc/ssh/ssh_host*
