@@ -18,6 +18,9 @@ find /etc -maxdepth 1 -type l -name 'resolv.conf' -print -delete
 echo "nameserver 2a00:f10:ff04:153::53"|tee /etc/resolv.conf
 echo "nameserver 2a00:f10:ff04:253::53"|tee -a /etc/resolv.conf
 
+echo "Installing required packages for CloudStack"
+dnf install -y wget curl
+
 echo "Enabling systemd services"
 systemctl enable cloud-init cloud-config fstrim.timer qemu-guest-agent
 
